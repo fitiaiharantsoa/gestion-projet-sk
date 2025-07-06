@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Project index{% endblock %}
+
+{% block body %}
+    <h1>Project index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Titre</th>
+                <th>Description</th>
+                <th>Bu</th>
+                <th>DateDebut</th>
+                <th>DateFin</th>
+                <th>Statut</th>
+                <th>Categorie</th>
+                <th>CreatedAt</th>
+                <th>UpdatedAt</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for project in projects %}
+            <tr>
+                <td>{{ project.id }}</td>
+                <td>{{ project.titre }}</td>
+                <td>{{ project.description }}</td>
+                <td>{{ project.bu }}</td>
+                <td>{{ project.dateDebut ? project.dateDebut|date('Y-m-d') : '' }}</td>
+                <td>{{ project.dateFin ? project.dateFin|date('Y-m-d') : '' }}</td>
+                <td>{{ project.statut }}</td>
+                <td>{{ project.categorie }}</td>
+                <td>{{ project.createdAt ? project.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ project.updatedAt ? project.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_project_show', {'id': project.id}) }}">show</a>
+                    <a href="{{ path('app_project_edit', {'id': project.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="11">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_project_new') }}">Create new</a>
+{% endblock %}
