@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouveau fichier projet{% endblock %}
+
+{% block body %}
+    <h1>Ajouter un nouveau fichier au projet</h1>
+
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <button class="btn btn-primary">Enregistrer</button>
+    {{ form_end(form) }}
+
+    <a href="{{ path('app_project_file_index') }}">Retour à la liste des fichiers</a>
+{% endblock %}

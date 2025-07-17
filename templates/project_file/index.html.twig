@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ProjectFile index{% endblock %}
+
+{% block body %}
+    <h1>ProjectFile index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Type</th>
+                <th>DateUpload</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for project_file in project_files %}
+            <tr>
+                <td>{{ project_file.id }}</td>
+                <td>{{ project_file.type }}</td>
+                <td>{{ project_file.dateUpload ? project_file.dateUpload|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_project_file_show', {'id': project_file.id}) }}">show</a>
+                    <a href="{{ path('app_project_file_edit', {'id': project_file.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_project_file_new') }}">Create new</a>
+{% endblock %}

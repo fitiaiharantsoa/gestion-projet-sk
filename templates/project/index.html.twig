@@ -1,51 +1,69 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Project index{% endblock %}
+{% block title %}Project List{% endblock %}
 
 {% block body %}
-    <h1>Project index</h1>
+<h1 class="page-title">Project List</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Titre</th>
-                <th>Description</th>
-                <th>Bu</th>
-                <th>DateDebut</th>
-                <th>DateFin</th>
-                <th>Statut</th>
-                <th>Categorie</th>
-                <th>CreatedAt</th>
-                <th>UpdatedAt</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
+{# Résumé des progressions selon rôle #}
+{% if 'ROLE_PDG' in app.user.roles %}
+    <h3>Global Progression: {{ progressionGlobale }}%</h3>
+    <h4>Progression by Department:</h4>
+    <ul>
+        {% for depId, prog in progressionParDepartement %}
+            <li>Department {{ depId ?: 'Unassigned' }} : {{ prog }}%</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+{% if 'ROLE_BU' in app.user.roles %}
+    {% set depId = app.user.departement ? app.user.departement.id : null %}
+    <h3>Your Department's Progression: {{ progressionParDepartement[depId]|default(0) }}%</h3>
+{% endif %}
+
+{% if 'ROLE_USER' in app.user.roles %}
+    {% set userId = app.user.id %}
+    <h3>Your Total Progression: {{ progressionParUser[userId]|default(0) }}%</h3>
+{% endif %}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Average Progress (%)</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
         {% for project in projects %}
+            {# Calcul de la progression moyenne du projet #}
+            {% set tasks = project.tasks %}
+            {% set sumProgress = 0 %}
+            {% set countTasks = tasks|length %}
+            {% for task in tasks %}
+                {% set sumProgress = sumProgress + (task.progression ?: 0) %}
+            {% endfor %}
+            {% set avgProgress = countTasks > 0 ? (sumProgress / countTasks)|round : 0 %}
+
             <tr>
                 <td>{{ project.id }}</td>
                 <td>{{ project.titre }}</td>
-                <td>{{ project.description }}</td>
-                <td>{{ project.bu }}</td>
-                <td>{{ project.dateDebut ? project.dateDebut|date('Y-m-d') : '' }}</td>
-                <td>{{ project.dateFin ? project.dateFin|date('Y-m-d') : '' }}</td>
                 <td>{{ project.statut }}</td>
-                <td>{{ project.categorie }}</td>
-                <td>{{ project.createdAt ? project.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ project.updatedAt ? project.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ avgProgress }}%</td>
                 <td>
-                    <a href="{{ path('app_project_show', {'id': project.id}) }}">show</a>
-                    <a href="{{ path('app_project_edit', {'id': project.id}) }}">edit</a>
+                    <a href="{{ path('app_project_show', {'id': project.id}) }}">View</a>
+                    <a href="{{ path('app_project_edit', {'id': project.id}) }}">Edit</a>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="11">no records found</td>
+                <td colspan="5">No projects found.</td>
             </tr>
         {% endfor %}
-        </tbody>
-    </table>
+    </tbody>
+</table>
 
-    <a href="{{ path('app_project_new') }}">Create new</a>
+<a class="btn btn-create" href="{{ path('app_project_new') }}">Create New Project</a>
 {% endblock %}

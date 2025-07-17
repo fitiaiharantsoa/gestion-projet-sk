@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}TaskComment index{% endblock %}
+
+{% block body %}
+    <h1>TaskComment index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Message</th>
+                <th>DateCommentaire</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for task_comment in task_comments %}
+            <tr>
+                <td>{{ task_comment.id }}</td>
+                <td>{{ task_comment.message }}</td>
+                <td>{{ task_comment.dateCommentaire ? task_comment.dateCommentaire|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_task_comment_show', {'id': task_comment.id}) }}">show</a>
+                    <a href="{{ path('app_task_comment_edit', {'id': task_comment.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_task_comment_new') }}">Create new</a>
+{% endblock %}

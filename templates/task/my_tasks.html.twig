@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Tâches{% endblock %}
+
+{% block body %}
+<h1>Mes Tâches</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Projet</th>
+            <th>Titre</th>
+            <th>Statut</th>
+            <th>Progression (%)</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for task in tasks %}
+            <tr>
+                <td>{{ task.id }}</td>
+                <td>{{ task.project.titre }}</td>
+                <td>{{ task.titre }}</td>
+                <td>{{ task.statut }}</td>
+                <td>{{ task.progression ?: 0 }}%</td>
+                <td>
+                    {% if task.statut == 'à lancer' or task.statut == 'non commencée' %}
+                        <a href="{{ path('app_task_start', {'id': task.id}) }}" class="btn btn-primary btn-sm">Lancer</a>
+                    {% elseif task.statut == 'en cours' %}
+                        <a href="{{ path('app_task_finish', {'id': task.id}) }}" class="btn btn-success btn-sm">Terminer</a>
+                    {% else %}
+                        <span>Terminé</span>
+                    {% endif %}
+                    <a href="{{ path('app_task_show', {'id': task.id}) }}" class="btn btn-info btn-sm">Voir</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">Vous n'avez aucune tâche assignée.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

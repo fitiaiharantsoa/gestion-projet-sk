@@ -20,17 +20,26 @@ class Task
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
 
+    /**
+     * Statut possible : 'à faire', 'en cours', 'bloquée', 'terminée'
+     */
     #[ORM\Column(length: 50)]
-    private string $statut = 'à faire'; // à faire, en cours, bloquée, terminée
+    private string $statut = 'à faire';
 
     #[ORM\Column(type: 'date', nullable: true)]
     private ?\DateTimeInterface $dateEcheance = null;
 
+    /**
+     * Priorité : 'haute', 'moyenne', 'basse' ou null
+     */
     #[ORM\Column(length: 20, nullable: true)]
-    private ?string $priorite = null; // haute, moyenne, basse
+    private ?string $priorite = null;
 
+    /**
+     * Progression en pourcentage (0 à 100)
+     */
     #[ORM\Column(type: 'integer', nullable: true)]
-    private ?int $progression = null; // en pourcentage
+    private ?int $progression = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     private ?User $assigne = null;
@@ -43,6 +52,14 @@ class Task
 
     #[ORM\Column(type: 'datetime')]
     private ?\DateTimeInterface $updatedAt = null;
+
+    public function __construct()
+    {
+        // Initialise la progression à 0 par défaut si null
+        if ($this->progression === null) {
+            $this->progression = 0;
+        }
+    }
 
     public function getId(): ?int
     {
@@ -162,13 +179,29 @@ class Task
     #[ORM\PrePersist]
     public function onPrePersist(): void
     {
-        $this->createdAt = new \DateTime();
-        $this->updatedAt = new \DateTime();
+        $now = new \DateTime();
+        $this->createdAt = $now;
+        $this->updatedAt = $now;
+        $this->updateStatutFromProgression();
     }
 
     #[ORM\PreUpdate]
     public function onPreUpdate(): void
     {
         $this->updatedAt = new \DateTime();
+        $this->updateStatutFromProgression();
+    }
+
+    private function updateStatutFromProgression(): void
+    {
+        if ($this->statut !== 'bloquée') { // ne pas écraser si bloquée
+            if ($this->progression === 100) {
+                $this->statut = 'terminée';
+            } elseif ($this->progression > 0) {
+                $this->statut = 'en cours';
+            } elseif ($this->progression === 0 || $this->progression === null) {
+                $this->statut = 'à faire';
+            }
+        }
     }
 }

@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ProjectFile{% endblock %}
+
+{% block body %}
+    <h1>ProjectFile</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ project_file.id }}</td>
+            </tr>
+            <tr>
+                <th>Type</th>
+                <td>{{ project_file.type }}</td>
+            </tr>
+            <tr>
+                <th>DateUpload</th>
+                <td>{{ project_file.dateUpload ? project_file.dateUpload|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_project_file_index') }}">back to list</a>
+
+    <a href="{{ path('app_project_file_edit', {'id': project_file.id}) }}">edit</a>
+
+    {{ include('project_file/_delete_form.html.twig') }}
+{% endblock %}

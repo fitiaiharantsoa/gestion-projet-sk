@@ -5,6 +5,38 @@
 {% block body %}
     <h1>Project</h1>
 
+    <h3>Progression globale du projet :</h3>
+
+    <div class="progress mb-3" style="height: 25px;">
+        <div class="progress-bar 
+            {% if progressionGlobale == 100 %} bg-success
+            {% elseif progressionGlobale >= 50 %} bg-info
+            {% else %} bg-warning {% endif %}"
+            role="progressbar"
+            style="width: {{ progressionGlobale }}%;"
+            aria-valuenow="{{ progressionGlobale }}"
+            aria-valuemin="0"
+            aria-valuemax="100">
+            {{ progressionGlobale }}%
+        </div>
+    </div>
+
+    <p>
+        <strong>État du projet :</strong>
+        <span class="badge 
+            {% if progressionGlobale == 100 %} bg-success
+            {% elseif progressionGlobale >= 50 %} bg-info
+            {% else %} bg-secondary {% endif %}">
+            {% if progressionGlobale == 100 %}
+                Terminé
+            {% elseif progressionGlobale >= 50 %}
+                En cours
+            {% else %}
+                À démarrer
+            {% endif %}
+        </span>
+    </p>
+
     <table class="table">
         <tbody>
             <tr>
@@ -51,7 +83,6 @@
     </table>
 
     <a href="{{ path('app_project_index') }}">back to list</a>
-
     <a href="{{ path('app_project_edit', {'id': project.id}) }}">edit</a>
 
     {{ include('project/_delete_form.html.twig') }}

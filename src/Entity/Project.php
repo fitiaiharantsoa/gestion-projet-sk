@@ -3,12 +3,15 @@
 namespace App\Entity;
 
 use App\Repository\ProjectRepository;
-use Doctrine\ORM\Mapping as ORM;
+use App\Entity\User;
+use App\Entity\Departement;
+use App\Entity\Task;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
-#[ORM\HasLifecycleCallbacks]
 class Project
 {
     #[ORM\Id]
@@ -16,37 +19,42 @@ class Project
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 200)]
-    private string $titre;
+    #[ORM\Column(length: 255)]
+    private ?string $titre = null;
 
-    #[ORM\Column(type: 'text', nullable: true)]
+    #[ORM\Column(type: Types::TEXT)]
     private ?string $description = null;
 
-    #[ORM\Column(length: 100, nullable: true)]
-    private ?string $bu = null; // Ex : RH, IT, Juridique
+    #[ORM\Column(length: 255)]
+    private ?string $bu = null;
 
-    #[ORM\Column(type: 'date', nullable: true)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $dateDebut = null;
 
-    #[ORM\Column(type: 'date', nullable: true)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $dateFin = null;
 
-    #[ORM\Column(length: 50)]
-    private string $statut = 'en_cours'; // en_cours, terminé, annulé
+    #[ORM\Column(length: 255)]
+    private ?string $statut = null;
 
-    #[ORM\Column(length: 50, nullable: true)]
+    #[ORM\Column(length: 255)]
     private ?string $categorie = null;
 
-    #[ORM\Column(type: 'datetime')]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $createdAt = null;
 
-    #[ORM\Column(type: 'datetime')]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $updatedAt = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
     private ?User $responsable = null;
 
-    #[ORM\OneToMany(mappedBy: 'project', targetEntity: Task::class, cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(inversedBy: 'projects')]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Departement $departement = null;
+
+    #[ORM\OneToMany(mappedBy: 'project', targetEntity: Task::class, orphanRemoval: true)]
     private Collection $tasks;
 
     public function __construct()
@@ -59,12 +67,12 @@ class Project
         return $this->id;
     }
 
-    public function getTitre(): string
+    public function getTitre(): ?string
     {
         return $this->titre;
     }
 
-    public function setTitre(string $titre): self
+    public function setTitre(string $titre): static
     {
         $this->titre = $titre;
         return $this;
@@ -75,7 +83,7 @@ class Project
         return $this->description;
     }
 
-    public function setDescription(?string $description): self
+    public function setDescription(string $description): static
     {
         $this->description = $description;
         return $this;
@@ -86,7 +94,7 @@ class Project
         return $this->bu;
     }
 
-    public function setBu(?string $bu): self
+    public function setBu(string $bu): static
     {
         $this->bu = $bu;
         return $this;
@@ -97,7 +105,7 @@ class Project
         return $this->dateDebut;
     }
 
-    public function setDateDebut(?\DateTimeInterface $dateDebut): self
+    public function setDateDebut(\DateTimeInterface $dateDebut): static
     {
         $this->dateDebut = $dateDebut;
         return $this;
@@ -108,18 +116,18 @@ class Project
         return $this->dateFin;
     }
 
-    public function setDateFin(?\DateTimeInterface $dateFin): self
+    public function setDateFin(\DateTimeInterface $dateFin): static
     {
         $this->dateFin = $dateFin;
         return $this;
     }
 
-    public function getStatut(): string
+    public function getStatut(): ?string
     {
         return $this->statut;
     }
 
-    public function setStatut(string $statut): self
+    public function setStatut(string $statut): static
     {
         $this->statut = $statut;
         return $this;
@@ -130,7 +138,7 @@ class Project
         return $this->categorie;
     }
 
-    public function setCategorie(?string $categorie): self
+    public function setCategorie(string $categorie): static
     {
         $this->categorie = $categorie;
         return $this;
@@ -141,7 +149,7 @@ class Project
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTimeInterface $createdAt): self
+    public function setCreatedAt(\DateTimeInterface $createdAt): static
     {
         $this->createdAt = $createdAt;
         return $this;
@@ -152,23 +160,10 @@ class Project
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
+    public function setUpdatedAt(\DateTimeInterface $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
         return $this;
-    }
-
-    #[ORM\PrePersist]
-    public function onPrePersist(): void
-    {
-        $this->createdAt = new \DateTime();
-        $this->updatedAt = new \DateTime();
-    }
-
-    #[ORM\PreUpdate]
-    public function onPreUpdate(): void
-    {
-        $this->updatedAt = new \DateTime();
     }
 
     public function getResponsable(): ?User
@@ -176,18 +171,32 @@ class Project
         return $this->responsable;
     }
 
-    public function setResponsable(?User $responsable): self
+    public function setResponsable(?User $responsable): static
     {
         $this->responsable = $responsable;
         return $this;
     }
 
+    public function getDepartement(): ?Departement
+    {
+        return $this->departement;
+    }
+
+    public function setDepartement(?Departement $departement): static
+    {
+        $this->departement = $departement;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Task>
+     */
     public function getTasks(): Collection
     {
         return $this->tasks;
     }
 
-    public function addTask(Task $task): self
+    public function addTask(Task $task): static
     {
         if (!$this->tasks->contains($task)) {
             $this->tasks[] = $task;
@@ -197,10 +206,9 @@ class Project
         return $this;
     }
 
-    public function removeTask(Task $task): self
+    public function removeTask(Task $task): static
     {
         if ($this->tasks->removeElement($task)) {
-            // Set the owning side to null (unless already changed)
             if ($task->getProject() === $this) {
                 $task->setProject(null);
             }

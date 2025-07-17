@@ -1,0 +1,10 @@
+/vendor/
+/var/
+/.env
+.env.local
+.env.*.local
+/node_modules/
+/public/bundles/
+/public/build/
+/.idea/
+/*.lock

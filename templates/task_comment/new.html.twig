@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New TaskComment{% endblock %}
+
+{% block body %}
+    <h1>Create new TaskComment</h1>
+
+    {{ include('task_comment/_form.html.twig') }}
+
+    <a href="{{ path('app_task_comment_index') }}">back to list</a>
+{% endblock %}

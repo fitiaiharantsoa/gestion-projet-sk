@@ -1,16 +1,135 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}SK ONE{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <script src="{{ asset('js/trustedDevice.js') }}"></script>
 
-        {% block javascripts %}
-        {% endblock %}
-    </head>
-    <body>
+    <!-- Icônes (Phosphor) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+
+    <style>
+        body {
+            background-color: #F8F9FA;
+            color: #34495E;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        nav.navbar {
+            background-color: #2C3E50; /* bleu foncé */
+        }
+        nav.navbar .navbar-brand,
+        nav.navbar .nav-link {
+            color: #FFFFFF;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        nav.navbar .nav-link:hover {
+            color: #3498DB; /* bleu clair */
+        }
+        nav.navbar .navbar-brand strong {
+            font-size: 1.6rem;
+            letter-spacing: 1.5px;
+        }
+        .navbar-logo {
+            height: 50px;
+            width: 50px;
+            border-radius: 50%;
+            margin-right: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            object-fit: cover;
+            background-color: white;
+        }
+        .badge.bg-secondary {
+            background-color: #2980B9 !important; /* bleu moyen */
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            padding: 0.25em 0.5em;
+        }
+        footer {
+            color: #7F8C8D;
+            font-size: 0.9rem;
+            margin-top: 4rem;
+            padding-bottom: 1rem;
+            border-top: 1px solid #DDE1E3;
+        }
+    </style>
+</head>
+<body class="{{ app.session.get('theme') ?? 'light' }}">
+    
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark px-3 mb-4">
+        <a class="navbar-brand d-flex align-items-center" href="{{ path('app_dashboard') }}">
+            <img src="{{ asset('images/sk-logo.png') }}" alt="Logo" class="navbar-logo">
+            <strong>SK ONE</strong>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" 
+                aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                {% if is_granted('ROLE_BU')%}
+                    
+                <li class="nav-item" ><a class="nav-link" href="{{ path('app_project_index') }}">Projets</a></li>
+                {% endif %}
+              
+                <li class="nav-item"><a class="nav-link" href="{{ path('app_task_index') }}">Tâches</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ path('app_project_file_index') }}">Fichiers</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ path('app_task_comment_index') }}">Commentaires</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ path('app_project_log_index') }}">Journaux</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ path('app_notification_index') }}">Notifications</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ path('app_departement_index') }}">Départements</a>
+
+            </ul>
+
+            <ul class="navbar-nav ms-auto d-flex align-items-center gap-3">
+                {% if app.user %}
+                    <li class="nav-item text-white me-2">
+                 <strong>{{ app.user.email }}</strong>
+
+                    </li>
+                    <li class="nav-item">
+                        {# Si roles est un tableau, on affiche en string séparé par des virgules #}
+                        <span class="badge bg-secondary">{{ app.user.roles ? app.user.roles|join(', ') : 'USER' }}</span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_notification_index') }}" title="Notifications">🔔</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_switch_theme') }}" title="Changer le thème">🌓</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-light" href="{{ path('app_logout') }}">Déconnexion</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ path('app_login') }}">Connexion</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Contenu de la page -->
+    <div class="container">
         {% block body %}{% endblock %}
-    </body>
+    </div>
+
+    <!-- Pied de page -->
+    <footer class="text-center">
+        <small>© 2025 SK Groupe - Projet interne</small>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
 </html>

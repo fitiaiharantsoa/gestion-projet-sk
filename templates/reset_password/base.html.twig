@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}GestionSK{% endblock %}</title>
+        <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    </head>
+    <body>
+        <header>
+            <nav>
+                <ul>
+                    <li><a href="{{ path('app_task_index') }}">Tasks</a></li>
+                    <li><a href="{{ path('app_project_index') }}">Projects</a></li>
+                    <li><a href="{{ path('user_index') }}">Users</a></li>
+                    {% if app.user %}
+                        <li><a href="{{ path('user_profile', { id: app.user.id }) }}">Profile</a></li>
+                        <li><a href="{{ path('user_logout') }}">Logout</a></li>
+                    {% else %}
+                        <li><a href="{{ path('app_login') }}">Login</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </header>
+        <main>
+            {% block body %}{% endblock %}
+        </main>
+        <footer>
+            <p>&copy; 2025 GestionSK</p>
+        </footer>
+    </body>
+</html>

@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Authentification à deux facteurs{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1 class="mb-4">Authentification à deux facteurs</h1>
+
+
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger">{{ message }}</div>
+        {% endfor %}
+
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% endfor %}
+
+        <form method="post" action="{{ path('app_2fa_login_check') }}">
+            <div class="mb-3">
+                <label for="auth_code" class="form-label">Code reçu par email :</label>
+                <input type="text" id="auth_code" name="_auth_code" class="form-control" required autofocus />
+            </div>
+
+            <div class="form-check mb-3">
+                <input type="checkbox" class="form-check-input" id="remember_device" name="_remember_device" value="1">
+                <label class="form-check-label" for="remember_device">Se souvenir de cet appareil</label>
+            </div>
+
+            <input type="hidden" name="_trusted_device_token" id="_trusted_device_token" />
+
+            <button type="submit" class="btn btn-primary">Valider</button>
+        </form>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/TrustedDevice.js') }}"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const trustedToken = getCookie('trusted_device_token');
+            if (trustedToken) {
+                const tokenInput = document.getElementById('_trusted_device_token');
+                if (tokenInput) {
+                    tokenInput.value = trustedToken;
+                    console.log("✅ Token injecté dans le formulaire :", trustedToken);
+                }
+            } else {
+                console.log("⚠️ Aucun token à injecter.");
+            }
+        });
+    </script>
+{% endblock %}

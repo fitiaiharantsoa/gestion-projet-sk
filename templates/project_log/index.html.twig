@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ProjectLog index{% endblock %}
+
+{% block body %}
+    <h1>ProjectLog index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Action</th>
+                <th>PerformedAt</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for project_log in project_logs %}
+            <tr>
+                <td>{{ project_log.id }}</td>
+                <td>{{ project_log.action }}</td>
+                <td>{{ project_log.performedAt ? project_log.performedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_project_log_show', {'id': project_log.id}) }}">show</a>
+                    <a href="{{ path('app_project_log_edit', {'id': project_log.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_project_log_new') }}">Create new</a>
+{% endblock %}

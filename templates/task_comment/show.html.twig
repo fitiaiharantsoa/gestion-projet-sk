@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}TaskComment{% endblock %}
+
+{% block body %}
+    <h1>TaskComment</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ task_comment.id }}</td>
+            </tr>
+            <tr>
+                <th>Message</th>
+                <td>{{ task_comment.message }}</td>
+            </tr>
+            <tr>
+                <th>DateCommentaire</th>
+                <td>{{ task_comment.dateCommentaire ? task_comment.dateCommentaire|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_task_comment_index') }}">back to list</a>
+
+    <a href="{{ path('app_task_comment_edit', {'id': task_comment.id}) }}">edit</a>
+
+    {{ include('task_comment/_delete_form.html.twig') }}
+{% endblock %}
