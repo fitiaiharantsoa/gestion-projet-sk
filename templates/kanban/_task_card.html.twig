@@ -1,0 +1,14 @@
+<div class="task-card" data-kanban-target="task" data-task-id="{{ task.id }}">
+    <div class="task-header">
+        <span class="priority-badge priority-{{ task.priorite|default('medium') }}">
+            {{ task.priorite|capitalize|default('Moyenne') }}
+        </span>
+        <span class="task-due-date">
+            {% if task.dateEcheance %}
+                <small>Échéance: {{ task.dateEcheance|date('d/m/Y') }}</small>
+            {% endif %}
+        </span>
+    </div>
+    <h5 class="task-title">{{ task.titre }}</h5>
+    <p class="task-description">{{ task.description|length > 100 ? task.description|slice(0, 100) ~ '...' : task.description }}</p>
+</div>

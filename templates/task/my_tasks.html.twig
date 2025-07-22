@@ -5,41 +5,48 @@
 {% block body %}
 <h1>Mes Tâches</h1>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Projet</th>
-            <th>Titre</th>
-            <th>Statut</th>
-            <th>Progression (%)</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for task in tasks %}
-            <tr>
-                <td>{{ task.id }}</td>
-                <td>{{ task.project.titre }}</td>
-                <td>{{ task.titre }}</td>
-                <td>{{ task.statut }}</td>
-                <td>{{ task.progression ?: 0 }}%</td>
-                <td>
-                    {% if task.statut == 'à lancer' or task.statut == 'non commencée' %}
-                        <a href="{{ path('app_task_start', {'id': task.id}) }}" class="btn btn-primary btn-sm">Lancer</a>
-                    {% elseif task.statut == 'en cours' %}
-                        <a href="{{ path('app_task_finish', {'id': task.id}) }}" class="btn btn-success btn-sm">Terminer</a>
-                    {% else %}
-                        <span>Terminé</span>
-                    {% endif %}
-                    <a href="{{ path('app_task_show', {'id': task.id}) }}" class="btn btn-info btn-sm">Voir</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="6">Vous n'avez aucune tâche assignée.</td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="task-list">
+    {% for task in tasks %}
+        <div class="task-card">
+            <div class="task-header">
+            <strong>[TASK #{{ '%03d'|format(task.id) }}]</strong>
+            </div>
+            <p>📝 <strong>Titre :</strong> {{ task.titre }}</p>
+            <p>📄 <strong>Description :</strong> {{ task.description|length > 100 ? task.description|slice(0, 100) ~ '...' : task.description }}</p>
+            <p>📅 <strong>Deadline :</strong> {{ task.dateEcheance ? task.dateEcheance|date('d/m/Y H:i') : 'Non définie' }}</p>
+            <p>👤 <strong>Assigné :</strong> {{ task.assigne ? task.assigne.userIdentifier : 'Non assigné' }}</p>
+            <p>✉️ <strong>Demandeur :</strong> {{ task.createur ? task.createur.userIdentifier : 'Inconnu' }}</p>
+            <p>📌 <strong>Statut :</strong> {{ task.statut|capitalize }}</p>
+        </div>
+    {% else %}
+        <p>Aucune tâche assignée.</p>
+    {% endfor %}
+</div>
+
+<style>
+.task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 600px;
+    margin: auto;
+}
+.task-card {
+    background: #f0f4f8;
+    border-radius: 12px;
+    padding: 15px 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    font-family: Arial, sans-serif;
+}
+.task-card p {
+    margin: 5px 0;
+    font-size: 0.95rem;
+}
+.task-header {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    color: #2a4365;
+}
+</style>
+
 {% endblock %}

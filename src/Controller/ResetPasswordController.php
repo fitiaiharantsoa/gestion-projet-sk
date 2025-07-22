@@ -18,6 +18,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use SymfonyCasts\Bundle\ResetPassword\Controller\ResetPasswordControllerTrait;
 use SymfonyCasts\Bundle\ResetPassword\Exception\ResetPasswordExceptionInterface;
 use SymfonyCasts\Bundle\ResetPassword\ResetPasswordHelperInterface;
+use Psr\Log\LoggerInterface;
 
 #[Route('/reset-password')]
 class ResetPasswordController extends AbstractController
@@ -34,7 +35,7 @@ class ResetPasswordController extends AbstractController
      * Display & process form to request a password reset.
      */
     #[Route('', name: 'app_forgot_password_request')]
-    public function request(Request $request, MailerInterface $mailer): Response
+    public function request(Request $request, MailerInterface $mailer, LoggerInterface $logger): Response
     {
         $form = $this->createForm(ResetPasswordRequestFormType::class);
         $form->handleRequest($request);
@@ -43,8 +44,7 @@ class ResetPasswordController extends AbstractController
             /** @var string $email */
             $email = $form->get('email')->getData();
 
-            return $this->processSendingPasswordResetEmail($email, $mailer
-            );
+            return $this->processSendingPasswordResetEmail($email, $mailer, $logger);
         }
 
         return $this->render('reset_password/request.html.twig', [
@@ -128,44 +128,66 @@ class ResetPasswordController extends AbstractController
         ]);
     }
 
-    private function processSendingPasswordResetEmail(string $emailFormData, MailerInterface $mailer): RedirectResponse
+    private function processSendingPasswordResetEmail(string $emailFormData, MailerInterface $mailer, LoggerInterface $logger): RedirectResponse
     {
+        // Logs pour debug
+        $logger->info('=== DEBUT envoi email mot de passe oublié ===');
+        $logger->info('Email demandé: ' . $emailFormData);
+
         $user = $this->entityManager->getRepository(User::class)->findOneBy([
             'email' => $emailFormData,
         ]);
 
         // Do not reveal whether a user account was found or not.
         if (!$user) {
+            $logger->info('Utilisateur non trouvé pour: ' . $emailFormData);
             return $this->redirectToRoute('app_check_email');
         }
+
+        $logger->info('Utilisateur trouvé: ' . $user->getEmail());
 
         try {
             $resetToken = $this->resetPasswordHelper->generateResetToken($user);
+            $logger->info('Token généré avec succès');
         } catch (ResetPasswordExceptionInterface $e) {
-            // If you want to tell the user why a reset email was not sent, uncomment
-            // the lines below and change the redirect to 'app_forgot_password_request'.
-            // Caution: This may reveal if a user is registered or not.
-            //
-            // $this->addFlash('reset_password_error', sprintf(
-            //     '%s - %s',
-            //     ResetPasswordExceptionInterface::MESSAGE_PROBLEM_HANDLE,
-            //     $e->getReason()
-            // ));
-
+            $logger->error('Erreur génération token: ' . $e->getMessage());
             return $this->redirectToRoute('app_check_email');
         }
 
+        // Email simplifié sans headers supplémentaires
         $email = (new TemplatedEmail())
-            ->from(new Address('ft.iharantsoa@gmail.com', 'GroupeSk'))
+            ->from(new Address('admin@yitro-consulting.com', 'GroupeSk'))
             ->to((string) $user->getEmail())
-            ->subject('Your password reset request')
+            ->subject('🔐 Réinitialisation de votre mot de passe - GroupeSk')
             ->htmlTemplate('reset_password/email.html.twig')
             ->context([
                 'resetToken' => $resetToken,
-            ])
-        ;
+                'user' => $user,
+            ]);
 
-        $mailer->send($email);
+        $logger->info('Email créé, tentative d\'envoi...');
+
+        try {
+            // Envoi simple sans spécifier de transport
+            $mailer->send($email);
+            $logger->info('✅ Email envoyé avec succès');
+            
+            // Message de succès en développement
+            if ($this->getParameter('kernel.environment') === 'dev') {
+                $this->addFlash('success', 'Email de réinitialisation envoyé à : ' . $user->getEmail());
+            }
+            
+        } catch (\Exception $e) {
+            $logger->error('❌ ERREUR envoi email: ' . $e->getMessage());
+            $logger->error('Stack trace: ' . $e->getTraceAsString());
+            
+            // Message d'erreur en développement
+            if ($this->getParameter('kernel.environment') === 'dev') {
+                $this->addFlash('error', 'Erreur envoi email : ' . $e->getMessage());
+            }
+        }
+
+        $logger->info('=== FIN envoi email mot de passe oublié ===');
 
         // Store the token object in session for retrieval in check-email route.
         $this->setTokenObjectInSession($resetToken);

@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/task')]
@@ -121,5 +122,32 @@ final class TaskController extends AbstractController
         $em->flush();
 
         return $this->redirectToRoute('app_task_list');
+    }
+
+    #[Route('/{id}/update-status', name: 'app_task_update_status', methods: ['POST'])]
+    public function updateStatus(int $id, Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        $task = $em->getRepository(Task::class)->find($id);
+
+        if (!$task) {
+            return $this->json(['error' => 'Tâche non trouvée'], 404);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        if (!isset($data['status'])) {
+            return $this->json(['error' => 'Statut manquant'], 400);
+        }
+
+        $newStatus = $data['status'];
+
+        $validStatuses = ['à faire', 'en cours', 'bloquée', 'terminée'];
+        if (!in_array($newStatus, $validStatuses)) {
+            return $this->json(['error' => 'Statut invalide'], 400);
+        }
+
+        $task->setStatut($newStatus);
+        $em->flush();
+
+        return $this->json(['success' => true]);
     }
 }

@@ -1,0 +1,43 @@
+{# templates/kanban/_modals.html.twig #}
+
+{# Modal pour ajouter une tâche #}
+<div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="addTaskForm" method="POST" action="{{ path('kanban_add_task') }}">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addTaskModalLabel">Nouvelle tâche</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="taskTitle" class="form-label">Titre</label>
+            <input type="text" class="form-control" id="taskTitle" name="title" required>
+          </div>
+          <div class="mb-3">
+            <label for="taskDescription" class="form-label">Description</label>
+            <textarea class="form-control" id="taskDescription" name="description"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="taskPriority" class="form-label">Priorité</label>
+            <select id="taskPriority" name="priority" class="form-select">
+              <option value="low">Basse</option>
+              <option value="medium" selected>Moyenne</option>
+              <option value="high">Haute</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="taskDueDate" class="form-label">Date d'échéance</label>
+            <input type="date" class="form-control" id="taskDueDate" name="due_date">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary">Créer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{# Tu peux aussi ajouter ici le modal d'édition similaire #}

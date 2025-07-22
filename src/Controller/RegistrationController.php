@@ -50,7 +50,8 @@ class RegistrationController extends AbstractController
             );
 
             // Automatically log the user in after registration
-            return $security->login($user, 'form_login', 'main');
+            $this->addFlash('success', 'Votre compte a été créé. Un email de confirmation vous a été envoyé. Votre compte sera activé après validation par un administrateur.');
+            return $this->redirectToRoute('app_login');
         }
 
         return $this->render('registration/register.html.twig', [

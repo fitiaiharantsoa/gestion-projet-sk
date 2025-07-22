@@ -1,9 +1,153 @@
-<h1>Hi!</h1>
-
-<p>To reset your password, please visit the following link</p>
-
-<a href="{{ url('app_reset_password', {token: resetToken.token}) }}">{{ url('app_reset_password', {token: resetToken.token}) }}</a>
-
-<p>This link will expire in {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.</p>
-
-<p>Cheers!</p>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Réinitialisation de votre mot de passe</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 300;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .content h2 {
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        .content p {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        .reset-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white !important;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 16px;
+            text-align: center;
+            transition: transform 0.2s;
+            margin: 20px 0;
+        }
+        .reset-button:hover {
+            transform: translateY(-2px);
+            text-decoration: none;
+            color: white !important;
+        }
+        .security-notice {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .security-notice h3 {
+            color: #856404;
+            margin-top: 0;
+            font-size: 16px;
+        }
+        .security-notice p {
+            color: #856404;
+            margin-bottom: 0;
+            font-size: 14px;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 20px 30px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+        .footer p {
+            margin: 0;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        .alternative-link {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 12px;
+            color: #495057;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>🔐 GroupeSk</h1>
+        </div>
+        
+        <div class="content">
+            <h2>Réinitialisation de votre mot de passe</h2>
+            
+            <p>Bonjour,</p>
+            
+            <p>Vous avez demandé la réinitialisation de votre mot de passe sur notre plateforme GroupeSk.</p>
+            
+            <p>Pour créer un nouveau mot de passe, cliquez simplement sur le bouton ci-dessous :</p>
+            
+            <div style="text-align: center;">
+                <a href="{{ url('app_reset_password', {token: resetToken.token}) }}" class="reset-button">
+                    ✨ Réinitialiser mon mot de passe
+                </a>
+            </div>
+            
+            <div class="security-notice">
+                <h3>🛡️ Informations importantes :</h3>
+                <p>
+                    • Ce lien expirera dans {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}<br>
+                    • Si vous n'avez pas demandé cette réinitialisation, ignorez cet email<br>
+                    • Ne partagez jamais ce lien avec personne
+                </p>
+            </div>
+            
+            <p><strong>Le bouton ne fonctionne pas ?</strong><br>
+            Copiez et collez ce lien dans votre navigateur :</p>
+            
+            <div class="alternative-link">
+                {{ url('app_reset_password', {token: resetToken.token}) }}
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>
+                Cet email a été envoyé automatiquement, merci de ne pas répondre.<br>
+                © {{ "now"|date("Y") }} GroupeSk - Tous droits réservés
+            </p>
+        </div>
+    </div>
+</body>
+</html>

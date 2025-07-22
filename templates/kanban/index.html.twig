@@ -1,0 +1,161 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau Kanban - {{ project.titre }}{% endblock %}
+
+{% block stylesheets %}
+  {{ parent() }}
+  <style>
+    .kanban-board {
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+      padding-bottom: 1rem;
+    }
+    .kanban-column {
+      background: #f0f4f8;
+      border-radius: 8px;
+      flex: 0 0 300px;
+      display: flex;
+      flex-direction: column;
+      max-height: 80vh;
+    }
+    .column-header {
+      background: #3498db;
+      color: white;
+      padding: 0.75rem;
+      border-radius: 8px 8px 0 0;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .column-content {
+      padding: 0.75rem;
+      overflow-y: auto;
+      flex-grow: 1;
+    }
+    .task-card {
+      background: white;
+      border-radius: 6px;
+      padding: 0.75rem;
+      margin-bottom: 0.75rem;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      cursor: grab;
+    }
+    .task-card:active {
+      cursor: grabbing;
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+<div class="container my-4" data-controller="kanban">
+  <h1 class="mb-4">Kanban du projet : {{ project.titre }}</h1>
+
+  <div class="kanban-board">
+    {% for status in ['à faire', 'en cours', 'bloquée', 'terminée'] %}
+      <div class="kanban-column" data-status="{{ status }}">
+        <div class="column-header">
+          {{ status|capitalize }}
+          <span class="badge bg-light text-dark">{{ tasksByStatus[status]|length }}</span>
+        </div>
+        <div class="column-content" data-kanban-target="column" data-status="{{ status }}">
+          {% for task in tasksByStatus[status] %}
+            <div class="task-card" data-kanban-target="task" data-task-id="{{ task.id }}">
+              <h5>{{ task.titre }}</h5>
+              <p>{{ task.description|length > 100 ? task.description|slice(0, 100) ~ '...' : task.description }}</p>
+              {% if task.dateEcheance %}
+                <small>Échéance : {{ task.dateEcheance|date('d/m/Y') }}</small>
+              {% endif %}
+              
+              {# Affichage de la progression #}
+              {% if task.progression is not null %}
+                <div class="progress mt-2">
+                  <div class="progress-bar" role="progressbar" style="width: {{ task.progression }}%" aria-valuenow="{{ task.progression }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <button class="btn btn-primary mt-4" data-bs-toggle="modal" data-bs-target="#addTaskModal">
+    + Ajouter une tâche
+  </button>
+
+  <!-- Modal d'ajout -->
+  <div class="modal fade" id="addTaskModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <form class="modal-content" method="POST" action="{{ path('kanban_add_task', {'id': project.id}) }}">
+        <div class="modal-header">
+          <h5 class="modal-title">Nouvelle tâche</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="title" class="form-label">Titre</label>
+            <input type="text" name="title" id="title" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea name="description" id="description" class="form-control"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="priority" class="form-label">Priorité</label>
+            <select name="priority" id="priority" class="form-select">
+              <option value="low">Basse</option>
+              <option value="medium" selected>Moyenne</option>
+              <option value="high">Haute</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="due_date" class="form-label">Date d'échéance</label>
+            <input type="date" name="due_date" id="due_date" class="form-control">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary">Créer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Initialisation de SortableJS
+    const columns = document.querySelectorAll('.kanban-column .column-content');
+
+    columns.forEach(column => {
+      new Sortable(column, {
+        group: 'kanban',
+        animation: 150,
+        onEnd(evt) {
+          const taskId = evt.item.dataset.taskId;
+          const newStatus = evt.from.dataset.status;
+
+          // Mettre à jour le statut de la tâche via AJAX
+          fetch(`/task/${taskId}/update-status`, {
+            method: 'POST',
+            body: JSON.stringify({ status: newStatus }),
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (!data.success) {
+              alert('Erreur lors de la mise à jour du statut');
+            }
+          })
+          .catch(err => console.error('Erreur :', err));
+        }
+      });
+    });
+  });
+</script>
+
+{% endblock %}

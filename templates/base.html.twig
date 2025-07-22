@@ -6,12 +6,21 @@
     
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-    <script src="{{ asset('js/trustedDevice.js') }}"></script>
 
-    <!-- Icônes (Phosphor) -->
+    {% block stylesheets %}
+        {{ encore_entry_link_tags('app') }}
+        {# Styles spécifiques aux pages enfants #}
+    {% endblock %}
+
+    {# Meta CSRF token pour AJAX sécurisé #}
+    <meta name="csrf-token" content="{{ csrf_token('authenticate') }}">
+
+    {# SortableJS (pour drag & drop) #}
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+    {# Icônes (Phosphor) #}
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
-
     <style>
         body {
             background-color: #F8F9FA;
@@ -76,28 +85,23 @@
 
         <div class="collapse navbar-collapse" id="navbarContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                {% if is_granted('ROLE_BU')%}
-                    
-                <li class="nav-item" ><a class="nav-link" href="{{ path('app_project_index') }}">Projets</a></li>
+                {% if is_granted('ROLE_BU') %}
+                    <li class="nav-item"><a class="nav-link" href="{{ path('app_project_index') }}">Projets</a></li>
                 {% endif %}
-              
                 <li class="nav-item"><a class="nav-link" href="{{ path('app_task_index') }}">Tâches</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ path('app_project_file_index') }}">Fichiers</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ path('app_task_comment_index') }}">Commentaires</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ path('app_project_log_index') }}">Journaux</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ path('app_notification_index') }}">Notifications</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ path('app_departement_index') }}">Départements</a>
-
+                <li class="nav-item"><a class="nav-link" href="{{ path('app_departement_index') }}">Départements</a></li>
             </ul>
 
             <ul class="navbar-nav ms-auto d-flex align-items-center gap-3">
                 {% if app.user %}
                     <li class="nav-item text-white me-2">
-                 <strong>{{ app.user.email }}</strong>
-
+                        <strong>{{ app.user.email }}</strong>
                     </li>
                     <li class="nav-item">
-                        {# Si roles est un tableau, on affiche en string séparé par des virgules #}
                         <span class="badge bg-secondary">{{ app.user.roles ? app.user.roles|join(', ') : 'USER' }}</span>
                     </li>
                     <li class="nav-item">

@@ -4,9 +4,9 @@ namespace App\Entity;
 
 use App\Repository\TaskRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TaskRepository::class)]
-#[ORM\HasLifecycleCallbacks]
 class Task
 {
     #[ORM\Id]
@@ -14,59 +14,53 @@ class Task
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 200)]
-    private string $titre;
+    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    private ?string $titre = null;
 
-    #[ORM\Column(type: 'text', nullable: true)]
+    #[ORM\Column(type: "text")]
+    #[Assert\NotBlank]
     private ?string $description = null;
 
-    /**
-     * Statut possible : 'à faire', 'en cours', 'bloquée', 'terminée'
-     */
     #[ORM\Column(length: 50)]
-    private string $statut = 'à faire';
+    private ?string $statut = 'à faire';
 
-    #[ORM\Column(type: 'date', nullable: true)]
+    #[ORM\Column(type: "date", nullable: true)]
     private ?\DateTimeInterface $dateEcheance = null;
 
-    /**
-     * Priorité : 'haute', 'moyenne', 'basse' ou null
-     */
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $priorite = null;
 
-    /**
-     * Progression en pourcentage (0 à 100)
-     */
-    #[ORM\Column(type: 'integer', nullable: true)]
-    private ?int $progression = null;
+    #[ORM\Column(type: "integer", options: ["default" => 0])]
+    private ?int $progression = 0;
 
-    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
+
+    #[ORM\ManyToOne(inversedBy: 'tasks')]
+    #[ORM\JoinColumn(nullable: false)]
     private ?User $assigne = null;
 
-    #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'tasks')]
+    #[ORM\ManyToOne(inversedBy: 'tasks')]
+    #[ORM\JoinColumn(nullable: false)]
     private ?Project $project = null;
 
-    #[ORM\Column(type: 'datetime')]
-    private ?\DateTimeInterface $createdAt = null;
+    // Ajouter le champ createur
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: true)] // Permet de laisser la valeur NULL
+    private ?User $createur = null;
 
-    #[ORM\Column(type: 'datetime')]
-    private ?\DateTimeInterface $updatedAt = null;
-
-    public function __construct()
-    {
-        // Initialise la progression à 0 par défaut si null
-        if ($this->progression === null) {
-            $this->progression = 0;
-        }
-    }
+    // Getters & setters
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getTitre(): string
+    public function getTitre(): ?string
     {
         return $this->titre;
     }
@@ -82,13 +76,13 @@ class Task
         return $this->description;
     }
 
-    public function setDescription(?string $description): self
+    public function setDescription(string $description): self
     {
         $this->description = $description;
         return $this;
     }
 
-    public function getStatut(): string
+    public function getStatut(): ?string
     {
         return $this->statut;
     }
@@ -126,9 +120,31 @@ class Task
         return $this->progression;
     }
 
-    public function setProgression(?int $progression): self
+    public function setProgression(int $progression): self
     {
         $this->progression = $progression;
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
         return $this;
     }
 
@@ -154,32 +170,21 @@ class Task
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getCreateur(): ?User
     {
-        return $this->createdAt;
+        return $this->createur;
     }
 
-    public function setCreatedAt(?\DateTimeInterface $createdAt): self
+    public function setCreateur(?User $createur): self
     {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?\DateTimeInterface
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
-    {
-        $this->updatedAt = $updatedAt;
+        $this->createur = $createur;
         return $this;
     }
 
     #[ORM\PrePersist]
     public function onPrePersist(): void
     {
-        $now = new \DateTime();
+        $now = new \DateTimeImmutable();
         $this->createdAt = $now;
         $this->updatedAt = $now;
         $this->updateStatutFromProgression();
@@ -188,7 +193,7 @@ class Task
     #[ORM\PreUpdate]
     public function onPreUpdate(): void
     {
-        $this->updatedAt = new \DateTime();
+        $this->updatedAt = new \DateTimeImmutable();
         $this->updateStatutFromProgression();
     }
 

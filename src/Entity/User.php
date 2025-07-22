@@ -39,8 +39,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[ORM\Column]
     private bool $isEmailAuthEnabled = false;
 
-    #[ORM\Column(type: 'string', nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $authCode = null;
+
+    // Champ nom - ajout de nullable: true pour éviter les erreurs
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $nom = null;
+
+    // Ajout du champ prenom si vous en avez besoin
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $prenom = null;
+    
 
     /**
      * @var Collection<int, ProjectLog>
@@ -78,6 +87,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         return $this;
     }
 
+    public function getNom(): ?string
+    {
+        return $this->nom;
+    }
+
+    public function setNom(?string $nom): static
+    {
+        $this->nom = $nom;
+        return $this;
+    }
+
+    public function getPrenom(): ?string
+    {
+        return $this->prenom;
+    }
+
+    public function setPrenom(?string $prenom): static
+    {
+        $this->prenom = $prenom;
+        return $this;
+    }
+
     public function getUserIdentifier(): string
     {
         return (string) $this->email;
@@ -87,9 +118,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     {
         $roles = $this->roles;
 
-        // Garantir que chaque utilisateur a au moins ROLE_USER
-        if (!in_array('ROLE_USER', $roles, true)) {
-            $roles[] = 'ROLE_USER';
+        if (empty($roles)) {
+            return ['ROLE_USER']; // Retourner au moins ROLE_USER par défaut
         }
 
         return array_unique($roles);
@@ -203,7 +233,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     public function getEmailAuthCode(): string
     {
         if ($this->authCode === null) {
-            throw new \LogicException('Le code d’authentification email n’est pas défini.');
+            throw new \LogicException('Le code d\'authentification email n\'est pas défini.');
         }
         return $this->authCode;
     }
@@ -211,5 +241,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     public function setEmailAuthCode(string $authCode): void
     {
         $this->authCode = $authCode;
+    }
+
+    // Méthode utile pour afficher le nom complet
+    public function getFullName(): string
+    {
+        $parts = array_filter([$this->prenom, $this->nom]);
+        return empty($parts) ? $this->email : implode(' ', $parts);
+    }
+
+    public function __toString(): string
+    {
+        return $this->getFullName();
     }
 }
