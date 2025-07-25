@@ -79,7 +79,9 @@ final class ProjectController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $project = new Project();
-        $form = $this->createForm(ProjectType::class, $project);
+        $form = $this->createForm(ProjectType::class, $project, [
+            'attr'=>['class'=>'container form-control']
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

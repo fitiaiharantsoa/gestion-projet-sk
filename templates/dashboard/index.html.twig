@@ -3,28 +3,14 @@
 {% block title %}Tableau de bord{% endblock %}
 
 {% block body %}
-<h2 class="mb-4">Bienvenue, {{ app.user.email }}</h2>
+<h2 class="mb-4">Bienvenue, {{ app.user.nom }} {{ app.user.prenom }}</h2>
 
-<div class="row g-4">
+<div class="row ">
 
     <div class="col-md-4">
         <div class="p-4 shadow rounded bg-light">
-            <h5>Tâches en cours</h5>
+            <h5 >Tâches en cours</h5>
             <p>42 tâches en cours</p>
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="p-4 shadow rounded bg-light">
-            <h5>Projets en retard</h5>
-            <p>3 projets</p>
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="p-4 shadow rounded bg-light">
-            <h5>Notifications</h5>
-            <p>5 nouvelles alertes</p>
         </div>
     </div>
 

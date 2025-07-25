@@ -1,4 +1,27 @@
 {{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+{# {{ form_widget(form) }} #}
+
+<div class="col"> {{ form_row(form.titre) }}</div>
+<div class="col"> {{ form_row(form.description) }}</div>
+
+<div class="row">
+    {# <div class="col">{{ form_row(form.statut) }}</div> #}
+    <div class="col">{{ form_row(form.categorie) }}</div>
+    <div class="col"> {{ form_row(form.bu) }}</div>
+</div>
+<div class="row">
+    <div class="col">{{ form_row(form.dateDebut) }}</div>
+    <div class="col">{{ form_row(form.dateFin) }}</div>
+</div>
+
+
+<div class="row">
+    <div class="col">
+        {{ form_row(form.responsable) }}
+    </div>
+    <div class="col">
+        {{ form_row(form.departement) }}
+    </div>
+</div>
+<button class="btn btn-primary mt-2">{{ button_label|default('Save') }}</button>
 {{ form_end(form) }}
