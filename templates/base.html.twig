@@ -22,6 +22,8 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
     <style>
+        
+	
         body {
             background-color: #F8F9FA;
             color: #34495E;
@@ -66,6 +68,28 @@
             margin-top: 4rem;
             padding-bottom: 1rem;
             border-top: 1px solid #DDE1E3;
+        }
+        #boite_notif{
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            display: flex;
+            flex-direction: column;
+            width: 250px;
+            max-height: 500px;
+            overflow-y: scroll;
+            scrollbar-width: none;
+            font-size: small;
+            &>div{
+                display: flex;
+                flex-direction: column;
+                gap: 0;
+                background-color: #7f8c8d58;
+                span{
+                    font-size: smaller;
+                }
+                
+            }
         }
     </style>
 </head>
@@ -126,12 +150,63 @@
     <div class="container">
         {% block body %}{% endblock %}
     </div>
-
+    <div id="boite_notif">
+        <div id="notif" ></div>
+    </div>
+    
     <!-- Pied de page -->
     <footer class="text-center">
         <small>© 2025 SK Groupe - Projet interne</small>
     </footer>
+    
+    {% if app.user %}
+    <script>
+        const url = new URL('http://localhost:3000/hub');
+            url.searchParams.append('topic', 'http://gestionprojet.com/notif');
+            const eventSource = new EventSource(url);
+            
+            eventSource.onmessage = (e)=> {
+                let data = JSON.parse(e.data)
+                if (data.id_responsable == "{{ app.user.id }}" ){
+                    document.querySelector('#notif').insertAdjacentHTML('afterend', `<div class="alert">
 
+                        <p>Message : ${data.Message}</p>
+                        <span>Projet: ${data.titre_projet}</span>
+                        <span>Responsable : ${data.email_responsable}</span>
+                        <span>Début : ${data.date_debut}</span>
+                        <span>Deadline : ${data.deadline}</span>
+                        <span>Status : ${data.status}</span>
+
+                    </div>`)
+                    window.setTimeout(()=>{
+                        const $alert = document.querySelector('.alert');
+                        $alert.parentNode.removeChild($alert);
+                    }, 30000);
+                }                
+            }
+
+        const url2 = new URL('http://localhost:3000/hub');
+            url2.searchParams.append('topic', 'http://gestionprojet.com/notif/tache');
+            const eventSource2 = new EventSource(url2);
+            
+            eventSource2.onmessage = (e)=> {
+                let data = JSON.parse(e.data)
+                if (data.id_responsable == "{{ app.user.id }}" ){
+                    document.querySelector('#notif').insertAdjacentHTML('afterend', `<div class="alert">
+                        <p>Message : ${data.Message}</p>
+                        <span>Tâche: ${data.titre_tache}</span>
+                        <span>Responsable : ${data.email_responsable}</span>
+                        <span>Deadline : ${data.deadline}</span>
+                        <span>Status : ${data.status}</span>
+                    </div>`)
+                    window.setTimeout(()=>{
+                        const $alert = document.querySelector('.alert');
+                        $alert.parentNode.removeChild($alert);
+                    }, 30000);
+                }                
+            }
+        </script>
+    {% endif %}
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 

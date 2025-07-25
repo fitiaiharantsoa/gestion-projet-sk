@@ -89,19 +89,23 @@
   <div class="modal fade" id="addTaskModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
       <form class="modal-content" method="POST" action="{{ path('kanban_add_task', {'id': project.id}) }}">
+
         <div class="modal-header">
           <h5 class="modal-title">Nouvelle tâche</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
         </div>
+
         <div class="modal-body">
           <div class="mb-3">
             <label for="title" class="form-label">Titre</label>
             <input type="text" name="title" id="title" class="form-control" required>
           </div>
+
           <div class="mb-3">
             <label for="description" class="form-label">Description</label>
             <textarea name="description" id="description" class="form-control"></textarea>
           </div>
+
           <div class="mb-3">
             <label for="priority" class="form-label">Priorité</label>
             <select name="priority" id="priority" class="form-select">
@@ -110,10 +114,23 @@
               <option value="high">Haute</option>
             </select>
           </div>
+
+          <div class="mb-3">
+            <label for="assigne" class="form-label">Assigné à </label>
+            <select name="assigne" id="assigne" class="form-select">
+              {% for row in users %}
+                {% if row.roles[0] != "ROLE_PDG" %}
+                <option value="{{ row.id }}">{{ row.prenom }} {{ row.nom }} </option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+
           <div class="mb-3">
             <label for="due_date" class="form-label">Date d'échéance</label>
             <input type="date" name="due_date" id="due_date" class="form-control">
           </div>
+
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
