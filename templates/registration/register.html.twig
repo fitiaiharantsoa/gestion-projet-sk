@@ -12,14 +12,37 @@
     {{ form_errors(registrationForm) }}
 
     {{ form_start(registrationForm) }}
-        {{ form_row(registrationForm.email) }}
-        {{ form_row(registrationForm.prenom) }}
-        {{ form_row(registrationForm.nom) }}
-        {{ form_row(registrationForm.plainPassword, {
+        {# {{ form_row(registrationForm.email) }} #}
+        {# {{ form_row(registrationForm.prenom) }}
+        {{ form_row(registrationForm.nom) }} #}
+        <div class="form-floating mb-3">
+            {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
+            {{ form_label(registrationForm.email) }}
+            {{ form_errors(registrationForm.email) }}
+        </div>
+        <div class="form-floating mb-3">
+            {{ form_widget(registrationForm.prenom, {'attr': {'class': 'form-control'}}) }}
+            {{ form_label(registrationForm.prenom) }}
+            {{ form_errors(registrationForm.prenom) }}
+        </div>
+        <div class="form-floating mb-3">
+            {{ form_widget(registrationForm.nom, {'attr': {'class': 'form-control'}}) }}
+            {{ form_label(registrationForm.nom) }}
+            {{ form_errors(registrationForm.nom) }}
+        </div>
+
+        
+
+        <div class="form-floating mb-3">
+            {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control'}}) }}
+            {{ form_label(registrationForm.plainPassword) }}
+            {{ form_errors(registrationForm.plainPassword, {'label': 'Mot de passe'}) }}
+        </div>
+        {# {{ form_row(registrationForm.plainPassword, {
             label: 'Password'
-        }) }}
+        }) }} #}
         {{ form_row(registrationForm.agreeTerms) }}
 
-        <button type="submit" class="btn">Register</button>
+        <button type="submit" class="btn btn-primary">Register</button>
     {{ form_end(registrationForm) }}
 {% endblock %}

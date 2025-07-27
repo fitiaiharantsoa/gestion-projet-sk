@@ -5,7 +5,7 @@
 {% block body %}
     <h1>Créer un nouveau projet</h1>
 
-    {{ include('project/_form.html.twig') }}
+    {{ include('project/_form.html.twig', {'button_label': 'Créer'}) }}
 
     <a href="{{ path('app_project_index') }}">Revenir à la liste</a>
 {% endblock %}

@@ -4,23 +4,35 @@ namespace App\Controller;
 
 use App\Entity\Project;
 use App\Form\ProjectType;
+use App\Repository\DepartementRepository;
 use App\Repository\ProjectRepository;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[Route('/project')]
 final class ProjectController extends AbstractController
 {
     #[Route('', name: 'app_project_index', methods: ['GET'])]
-    public function index(ProjectRepository $projectRepository): Response
+    public function index(ProjectRepository $projectRepository, DepartementRepository $departementRepository,UserInterface $user): Response
     {
-        $projects = $projectRepository->findAll();
+        $departementDeUser = $departementRepository->findOneBy(['chef'=>$user->getId()]);
 
+        $projects = $projectRepository->findAll();
+        $project_encours = $projectRepository->findBy(['statut'=>'en cours']);
+        $project_a_faire = $projectRepository->findBy(['statut'=> 'à faire']);
+        $project_bloque = $projectRepository->findBy(['statut'=> 'bloqué']);
+        $project_termine = $projectRepository->findBy(['statut'=> 'terminé']);
+        $listeCouleur = [
+            '#FFC1CF','#F13030','#5A0001','#22181C', '#F6E8EA', '#F45B69', '#2A2D43','#414361','#7F2CCB', '#FF84E8', '#FFA9E7'
+        ];
         $progressionParUser = [];
         $progressionParDepartement = [];
+        $nomdepartement = [];
         $totalSomme = 0;
         $totalCount = 0;
 
@@ -29,9 +41,11 @@ final class ProjectController extends AbstractController
 
             $departement = $project->getDepartement();
             $departementId = $departement ? $departement->getId() : null;
+            $departementNom = $departement ? $departement->getNom() : null;
 
             if (!isset($progressionParDepartement[$departementId])) {
                 $progressionParDepartement[$departementId] = ['somme' => 0, 'count' => 0];
+                $nomdepartement[$departementId] = $departementNom;
             }
 
             foreach ($tasks as $task) {
@@ -72,6 +86,14 @@ final class ProjectController extends AbstractController
             'progressionParUser' => $progressionParUser,
             'progressionParDepartement' => $progressionParDepartement,
             'progressionGlobale' => $progressionGlobale,
+            'nomdep'=>$nomdepartement,
+            'couleur'=>$listeCouleur,
+            'total_projet'=>count($projects),
+            'total_encours'=>count($project_encours),
+            'total_a_faire'=>count($project_a_faire),
+            'total_bloque'=>count($project_bloque),
+            'total_termine'=>count($project_termine),
+            'departement_user'=>$departementDeUser,
         ]);
     }
 
@@ -85,6 +107,10 @@ final class ProjectController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $date = new DateTime('now');
+            $project->setStatut('à faire');
+            $project->setCreatedAt($date);
+            $project->setUpdatedAt($date);
             $entityManager->persist($project);
             $entityManager->flush();
 

@@ -5,22 +5,108 @@
 {% block body %}
 <h2 class="mb-4">Bienvenue, {{ app.user.nom }} {{ app.user.prenom }}</h2>
 
-<div class="row ">
+<div class=" " style="display: flex; flex-wrap: wrap; justify-content: space-evenly; gap: 20px;">
 
-    <div class="col-md-4">
-        <div class="p-4 shadow rounded bg-light">
-            <h5 >Tâches en cours</h5>
-            <p>42 tâches en cours</p>
-        </div>
+
+    <div class="p-4 shadow rounded bg-light" style="width: 18rem;">
+        <a href="{{ path('app_project_index') }}" class="btn"><h5>Projets ({{nbr_projet}}) </h5></a>
+        <canvas id="projet_chart"></canvas>
+    </div>
+    <div class="p-4 shadow rounded bg-light" style="width: 18rem;">
+        <a href="{{ path('app_task_index') }}" class="btn"><h5>Tâches ({{ nbr_tache }})</h5></a>
+        <canvas id="tache_chart"></canvas>
+    </div>
+    <div class="p-4 shadow rounded bg-light" style="width: 18rem;">
+        <a href="{{ path('user_index') }}" class="btn">
+            <h5> Utilisateur  ({{ utilisateur }})</h5>
+        </a>
+        <canvas id="user_chart"></canvas>
     </div>
 
-</div>
 
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const chart_projet_element = document.getElementById("projet_chart");
+    const data_nbr_projet = {
+        labels: [
+            'A faire',
+            'En cours',
+            'Bloqué',
+            'Terminé'
+        ],
+        datasets: [{
+            label: "Répartition des projets",
+            data: ['{{ projet_a_faire }}', '{{ projet_en_cours }}', '{{ projet_bloque }}', '{{ projet_termine }}'],
+            backgroundColor: [
+                '#A4B494',
+                '#BEC5AD',
+                '#3B5249',
+                '#519872'
+            ],
+            hoverOffset: 10
+        }]
+    };
+    const config_nbr_projet = {
+        type: 'doughnut',
+        data: data_nbr_projet,
+    };
+    const chart_projet = new Chart(chart_projet_element, config_nbr_projet);
+
+    const chart_tache_element = document.getElementById("tache_chart");
+    const data_nbr_tache = {
+        labels: [
+            'A faire',
+            'En cours',
+            'Bloqué',
+            'Terminé'
+        ],
+        datasets: [{
+            label: "Répartition des tâches",
+            data: ['{{ tache_a_faire }}', '{{ tache_en_cours }}', '{{ tache_bloque }}', '{{ tache_termine }}'],
+            backgroundColor: [
+                '#A4B494',
+                '#BEC5AD',
+                '#3B5249',
+                '#519872'
+            ],
+            hoverOffset: 10
+        }]
+    };
+    const config_nbr_tache = {
+        type: 'doughnut',
+        data: data_nbr_tache,
+    };
+    const chart_tache = new Chart(chart_tache_element, config_nbr_tache);
+    const chart_user_element = document.getElementById("user_chart");
+    const data_nbr_user = {
+        labels: [
+            'Chef département',
+            'Collaborateur',
+            'Chef BU'
+        ],
+        datasets: [{
+            label: "Répartition des utilisateurs",
+            data: ['{{ utilisateur_chef_departement }}', '{{ utilisateur_collaborateur }}', '{{ utilisateur_chef_bu }}'],
+            backgroundColor: [
+                '#A4B494',
+                '#BEC5AD',
+                '#3B5249'
+            ],
+            hoverOffset: 10
+        }]
+    };
+    const config_nbr_user = {
+        type: 'doughnut',
+        data: data_nbr_user,
+    };
+    const chart_user = new Chart(chart_user_element, config_nbr_user);
+</script>
 <!-- Ajout d’une section Utilisateurs avec lien vers la liste -->
-<div class="mt-5">
+{# <div class="mt-5">
     <a href="{{ path('user_index') }}" class="btn btn-primary">
         Voir la liste des utilisateurs
     </a>
-</div>
+</div> #}
 
 {% endblock %}

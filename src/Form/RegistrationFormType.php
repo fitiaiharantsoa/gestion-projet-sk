@@ -25,6 +25,11 @@ class RegistrationFormType extends AbstractType
                         'message' => 'You should agree to our terms.',
                     ]),
                 ],
+                'attr'=>[
+                    'class'=>'form-check-input'
+                ],
+                'label_attr'=>['class'=>'form-check-label'],
+                'row_attr' => ['class' => 'form-check mb-3'],
             ])
             ->add('prenom')
             ->add('nom')

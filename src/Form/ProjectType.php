@@ -9,8 +9,10 @@ use App\Repository\UserRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 
 class ProjectType extends AbstractType
 {
@@ -21,10 +23,16 @@ class ProjectType extends AbstractType
 
         $builder
             ->add('titre', null,[
-                'label'=>'Titre',
-                'label_attr'=>['class'=>'form-label mb-2'],
                 'attr'=>['class'=>'form-control'],
-                'required'=>true
+                'label'=> 'Titre',
+                'label_attr'=>[
+                    'class'=>''
+                ],
+                'row_attr'=>[
+                    'class'=>'mb-2',
+                    'placeholder'=>'Titre'
+                ],
+               
             ])
             ->add('description', null, [
                 'label_attr'=>['class'=>'form-label mt-2'],
@@ -41,11 +49,28 @@ class ProjectType extends AbstractType
                 'label_attr'=>['class'=>'form-label mt-2'],
                 'attr'=>['class'=>'form-select ']
             ])
-            ->add('dateDebut', null, [
+            ->add('statut', ChoiceType::class, [
+                'label'=>'Status',
+                'label_attr'=>['class'=>'form-label mt-2'],
+                'attr'=>['class'=>'form-select'],
+                'choices'=>[
+                    'A faire'=>'à faire',
+                    'En cours'=>'en cours',
+                    'Bloqué'=>'bloqué',
+                    'Terminé'=>'terminé'
+                ]
+            ])
+            ->add('dateDebut', DateType::class, [
                 'label_attr'=>['class'=> 'form-label mt-2'],
                 'attr'=>['class'=> 'form-control'],
+                'constraints'=>[
+                    new GreaterThanOrEqual([
+                        'value'=>'today',
+                        'message'=>'la date doit être superieur ou égal a aujourd\'hui'
+                    ])
+                ]
             ])
-            ->add('dateFin', null, [
+            ->add('dateFin', DateType::class, [
                 'label_attr'=>['class'=> 'form-label mt-2'],
                 'attr'=>['class'=> 'form-control']
             ])

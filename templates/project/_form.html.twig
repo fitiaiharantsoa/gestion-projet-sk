@@ -1,11 +1,14 @@
 {{ form_start(form) }}
 {# {{ form_widget(form) }} #}
 
-<div class="col"> {{ form_row(form.titre) }}</div>
-<div class="col"> {{ form_row(form.description) }}</div>
+<div class=""> {{ form_row(form.titre) }}</div>
+<div class="form-floating"> {{ form_row(form.description) }}</div>
 
 <div class="row">
-    {# <div class="col">{{ form_row(form.statut) }}</div> #}
+
+    <div class="col " style="display: '{{ button_label == 'Update' ? 'block' : 'none' }}';">{{ form_row(form.statut) }}</div>
+
+
     <div class="col">{{ form_row(form.categorie) }}</div>
     <div class="col"> {{ form_row(form.bu) }}</div>
 </div>
