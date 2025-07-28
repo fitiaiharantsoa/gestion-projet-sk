@@ -5,6 +5,9 @@
 {% block body %}
 <h2 class="mb-4">Bienvenue, {{ app.user.nom }} {{ app.user.prenom }}</h2>
 
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% if 'ROLE_PDG' in app.user.roles %}
 <div class=" " style="display: flex; flex-wrap: wrap; justify-content: space-evenly; gap: 20px;">
 
 
@@ -25,7 +28,6 @@
 
 
 </div>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const chart_projet_element = document.getElementById("projet_chart");
     const data_nbr_projet = {
@@ -102,6 +104,7 @@
     };
     const chart_user = new Chart(chart_user_element, config_nbr_user);
 </script>
+{% endif %}
 <!-- Ajout d’une section Utilisateurs avec lien vers la liste -->
 {# <div class="mt-5">
     <a href="{{ path('user_index') }}" class="btn btn-primary">
