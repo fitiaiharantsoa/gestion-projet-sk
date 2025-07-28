@@ -86,4 +86,20 @@
     <a href="{{ path('app_project_edit', {'id': project.id}) }}">edit</a>
 
     {{ include('project/_delete_form.html.twig') }}
+
+    <h2>Historique d’activité</h2>
+
+{% if logs is empty %}
+    <p>Aucun log disponible pour ce projet.</p>
+{% else %}
+    <ul class="list-group">
+        {% for log in logs %}
+            <li class="list-group-item">
+                <small class="text-muted">{{ log.createdAt ? log.createdAt|date('Y-m-d H:i:s') : '' }}</small>
+                — {{ log.message }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
 {% endblock %}

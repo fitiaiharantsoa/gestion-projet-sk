@@ -6,66 +6,31 @@ use App\Repository\ProjectLogRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProjectLogRepository::class)]
+#[ORM\Table(name: "project_log")]
 class ProjectLog
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: "integer")]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $action = null;
-
-    #[ORM\Column]
-    private ?\DateTime $performedAt = null;
-
-    #[ORM\ManyToOne(inversedBy: 'projectLogs')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $userRef = null;
-
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: "projectLogs")]
     #[ORM\JoinColumn(nullable: false)]
     private ?Project $project = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?User $user = null;
+
+    #[ORM\Column(type: "string", length: 255)]
+    private string $message;
+
+    #[ORM\Column(type: "datetime_immutable")]
+    private \DateTimeImmutable $createdAt;
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getAction(): ?string
-    {
-        return $this->action;
-    }
-
-    public function setAction(string $action): static
-    {
-        $this->action = $action;
-
-        return $this;
-    }
-
-    public function getPerformedAt(): ?\DateTime
-    {
-        return $this->performedAt;
-    }
-
-    public function setPerformedAt(\DateTime $performedAt): static
-    {
-        $this->performedAt = $performedAt;
-
-        return $this;
-    }
-
-    public function getUserRef(): ?User
-    {
-        return $this->userRef;
-    }
-
-    public function setUserRef(?User $userRef): static
-    {
-        $this->userRef = $userRef;
-
-        return $this;
     }
 
     public function getProject(): ?Project
@@ -73,10 +38,42 @@ class ProjectLog
         return $this->project;
     }
 
-    public function setProject(?Project $project): static
+    public function setProject(?Project $project): self
     {
         $this->project = $project;
+        return $this;
+    }
 
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+        return $this;
+    }
+
+    public function getMessage(): ?string
+    {
+        return $this->message;
+    }
+
+    public function setMessage(string $message): self
+    {
+        $this->message = $message;
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self
+    {
+        $this->createdAt = $createdAt;
         return $this;
     }
 }

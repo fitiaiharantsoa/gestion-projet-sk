@@ -42,19 +42,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $authCode = null;
 
-    // Champ nom - ajout de nullable: true pour éviter les erreurs
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $nom = null;
 
-    // Ajout du champ prenom si vous en avez besoin
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $prenom = null;
-    
+
+    // **AJOUT de la propriété departement**
+    #[ORM\ManyToOne(targetEntity: Departement::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Departement $departement = null;
 
     /**
      * @var Collection<int, ProjectLog>
      */
-    #[ORM\OneToMany(targetEntity: ProjectLog::class, mappedBy: 'userRef')]
+    #[ORM\OneToMany(targetEntity: ProjectLog::class, mappedBy: 'user')]
     private Collection $projectLogs;
 
     /**
@@ -109,6 +111,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         return $this;
     }
 
+    public function getDepartement(): ?Departement
+    {
+        return $this->departement;
+    }
+
+    public function setDepartement(?Departement $departement): static
+    {
+        $this->departement = $departement;
+        return $this;
+    }
+
     public function getUserIdentifier(): string
     {
         return (string) $this->email;
@@ -119,7 +132,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         $roles = $this->roles;
 
         if (empty($roles)) {
-            return ['ROLE_USER']; // Retourner au moins ROLE_USER par défaut
+            return ['ROLE_USER'];
         }
 
         return array_unique($roles);
@@ -144,7 +157,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function eraseCredentials(): void
     {
-        // Si tu stockes des données temporaires sensibles, les effacer ici
+        // Clear temporary sensitive data here if any
     }
 
     public function isVerified(): bool
@@ -170,7 +183,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     {
         if (!$this->projectLogs->contains($projectLog)) {
             $this->projectLogs->add($projectLog);
-            $projectLog->setUserRef($this);
+            $projectLog->setUser($this);
         }
         return $this;
     }
@@ -178,8 +191,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     public function removeProjectLog(ProjectLog $projectLog): static
     {
         if ($this->projectLogs->removeElement($projectLog)) {
-            if ($projectLog->getUserRef() === $this) {
-                $projectLog->setUserRef(null);
+            if ($projectLog->getUser() === $this) {
+                $projectLog->setUser(null);
             }
         }
         return $this;
@@ -212,7 +225,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         return $this;
     }
 
-    // --- Méthodes TwoFactorInterface (Email 2FA) ---
+    // TwoFactorInterface methods...
 
     public function getEmailAuthRecipient(): string
     {
@@ -243,7 +256,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         $this->authCode = $authCode;
     }
 
-    // Méthode utile pour afficher le nom complet
+    // Useful to display full name
+
     public function getFullName(): string
     {
         $parts = array_filter([$this->prenom, $this->nom]);

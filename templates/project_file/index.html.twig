@@ -1,37 +1,41 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}ProjectFile index{% endblock %}
+{% block title %}Fichiers des projets{% endblock %}
 
 {% block body %}
-    <h1>ProjectFile index</h1>
+    <h1>Liste des fichiers de projets</h1>
 
-    <table class="table">
+    <a href="{{ path('app_projet_file_new') }}" class="btn btn-primary">Ajouter un fichier</a>
+
+    <table class="table mt-3">
         <thead>
             <tr>
-                <th>Id</th>
+                <th>ID</th>
                 <th>Type</th>
-                <th>DateUpload</th>
-                <th>actions</th>
+                <th>Date Upload</th>
+                <th>Projet</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-        {% for project_file in project_files %}
+        {% for file in project_files %}
             <tr>
-                <td>{{ project_file.id }}</td>
-                <td>{{ project_file.type }}</td>
-                <td>{{ project_file.dateUpload ? project_file.dateUpload|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ file.id }}</td>
+                <td>{{ file.type }}</td>
+                <td>{{ file.dateUpload ? file.dateUpload|date('d/m/Y') : '' }}</td>
+                <td>{{ file.projet ? file.projet.titre : 'Aucun projet' }}</td>
                 <td>
-                    <a href="{{ path('app_project_file_show', {'id': project_file.id}) }}">show</a>
-                    <a href="{{ path('app_project_file_edit', {'id': project_file.id}) }}">edit</a>
+                    <a href="{{ path('app_projet_file_show', {'id': file.id}) }}">Voir</a>
+                    <a href="{{ path('app_projet_file_edit', {'id': file.id}) }}">Modifier</a>
+                    <form method="post" action="{{ path('app_projet_file_delete', {'id': file.id}) }}" style="display:inline;" onsubmit="return confirm('Confirmer la suppression ?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ file.id) }}">
+                        <button class="btn btn-sm btn-danger">Supprimer</button>
+                    </form>
                 </td>
             </tr>
         {% else %}
-            <tr>
-                <td colspan="4">no records found</td>
-            </tr>
+            <tr><td colspan="5">Aucun fichier trouvé.</td></tr>
         {% endfor %}
         </tbody>
     </table>
-
-    <a href="{{ path('app_project_file_new') }}">Create new</a>
 {% endblock %}

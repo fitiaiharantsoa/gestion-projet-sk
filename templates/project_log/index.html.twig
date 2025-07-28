@@ -1,37 +1,36 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}ProjectLog index{% endblock %}
+{% block title %}Historique des logs du projet{% endblock %}
 
 {% block body %}
-    <h1>ProjectLog index</h1>
+    <h1>Historique des logs du projet</h1>
 
     <table class="table">
         <thead>
             <tr>
                 <th>Id</th>
-                <th>Action</th>
-                <th>PerformedAt</th>
-                <th>actions</th>
+                <th>Message</th>
+                <th>Utilisateur</th>
+                <th>Date</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
         {% for project_log in project_logs %}
             <tr>
                 <td>{{ project_log.id }}</td>
-                <td>{{ project_log.action }}</td>
-                <td>{{ project_log.performedAt ? project_log.performedAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>
-                    <a href="{{ path('app_project_log_show', {'id': project_log.id}) }}">show</a>
-                    <a href="{{ path('app_project_log_edit', {'id': project_log.id}) }}">edit</a>
-                </td>
+                <td>{{ project_log.message }}</td>
+                <td>{{ project_log.user ? project_log.user.fullName  : 'Anonyme' }}</td>
+                <td>{{ project_log.createdAt ? project_log.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                
             </tr>
         {% else %}
             <tr>
-                <td colspan="4">no records found</td>
+                <td colspan="5">Aucun log trouvé.</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
-    <a href="{{ path('app_project_log_new') }}">Create new</a>
+    {# Suppression du lien 'Créer un nouveau log' car la route n'existe pas #}
 {% endblock %}

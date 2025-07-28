@@ -20,6 +20,12 @@ class NotificationType extends AbstractType
             ->add('createdBy', EntityType::class, [
                 'class' => User::class,
                 'choice_label' => 'id',
+                'label' => 'Créé par',
+            ])
+            ->add('recipient', EntityType::class, [
+                'class' => User::class,
+                'choice_label' => 'email',
+                'label' => 'Destinataire',
             ])
         ;
     }

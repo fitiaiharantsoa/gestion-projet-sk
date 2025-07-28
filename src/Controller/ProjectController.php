@@ -5,18 +5,28 @@ namespace App\Controller;
 use App\Entity\Project;
 use App\Form\ProjectType;
 use App\Repository\ProjectRepository;
+use App\Service\ProjectLogService; // <-- injection du service
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/project')]
 final class ProjectController extends AbstractController
 {
+    private ProjectLogService $projectLogService;
+
+    public function __construct(ProjectLogService $projectLogService)
+    {
+        $this->projectLogService = $projectLogService;
+    }
+
     #[Route('', name: 'app_project_index', methods: ['GET'])]
     public function index(ProjectRepository $projectRepository): Response
     {
+        // ... (inchangé)
         $projects = $projectRepository->findAll();
 
         $progressionParUser = [];
@@ -39,7 +49,6 @@ final class ProjectController extends AbstractController
                 $userId = $user ? $user->getId() : null;
                 $progression = $task->getProgression() ?? 0;
 
-                // Par utilisateur
                 if ($userId) {
                     if (!isset($progressionParUser[$userId])) {
                         $progressionParUser[$userId] = ['somme' => 0, 'count' => 0];
@@ -48,17 +57,14 @@ final class ProjectController extends AbstractController
                     $progressionParUser[$userId]['count']++;
                 }
 
-                // Par département
                 $progressionParDepartement[$departementId]['somme'] += $progression;
                 $progressionParDepartement[$departementId]['count']++;
 
-                // Total global
                 $totalSomme += $progression;
                 $totalCount++;
             }
         }
 
-        // Calcul des moyennes
         foreach ($progressionParUser as $userId => &$data) {
             $data = ($data['count'] > 0) ? round($data['somme'] / $data['count']) : 0;
         }
@@ -86,6 +92,9 @@ final class ProjectController extends AbstractController
             $entityManager->persist($project);
             $entityManager->flush();
 
+            // Log la création
+            $this->projectLogService->log($project, 'Création du projet');
+
             return $this->redirectToRoute('app_project_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -95,25 +104,29 @@ final class ProjectController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_project_show', methods: ['GET'])]
+    #[Route('/{id<\d+>}', name: 'app_project_show', methods: ['GET'])]
     public function show(Project $project): Response
     {
-        // Calcul de la progression globale
         $tasks = $project->getTasks();
         $total = count($tasks);
         $progressSum = 0;
-
+    
         foreach ($tasks as $task) {
             $progressSum += $task->getProgression() ?? 0;
         }
-
+    
         $averageProgress = $total > 0 ? (int)($progressSum / $total) : 0;
-
+    
+        // Récupération des logs pour ce projet
+        $logs = $this->projectLogService->getLogsForProject($project);
+    
         return $this->render('project/show.html.twig', [
             'project' => $project,
             'progressionGlobale' => $averageProgress,
+            'logs' => $logs,
         ]);
     }
+    
 
     #[Route('/{id}/edit', name: 'app_project_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Project $project, EntityManagerInterface $entityManager): Response
@@ -123,6 +136,9 @@ final class ProjectController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
+
+            // Log la modification
+            $this->projectLogService->log($project, 'Modification du projet');
 
             return $this->redirectToRoute('app_project_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -136,11 +152,46 @@ final class ProjectController extends AbstractController
     #[Route('/{id}', name: 'app_project_delete', methods: ['POST'])]
     public function delete(Request $request, Project $project, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$project->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $project->getId(), $request->request->get('_token'))) {
             $entityManager->remove($project);
             $entityManager->flush();
+
+            // Log la suppression
+            $this->projectLogService->log($project, 'Suppression du projet');
         }
 
         return $this->redirectToRoute('app_project_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/export/csv', name: 'app_project_export_csv', methods: ['GET'])]
+    public function exportCsv(ProjectRepository $projectRepository): StreamedResponse
+    {
+        $response = new StreamedResponse(function () use ($projectRepository) {
+            $handle = fopen('php://output', 'w');
+
+            // Ajout du BOM UTF-8 pour éviter les problèmes d'encodage sous Excel
+            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+
+            // En-têtes du fichier CSV
+            fputcsv($handle, ['ID', 'Titre', 'Département', 'Statut', 'Date de début', 'Deadline']);
+
+            foreach ($projectRepository->findAll() as $project) {
+                fputcsv($handle, [
+                    $project->getId(),
+                    $project->getTitre(),
+                    $project->getDepartement()?->getNom() ?? '—',
+                    $project->getStatut(),
+                    $project->getDateDebut()?->format('Y-m-d'),
+                    $project->getDateFin()?->format('Y-m-d'),
+                ]);
+            }
+
+            fclose($handle);
+        });
+
+        $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');
+        $response->headers->set('Content-Disposition', 'attachment; filename="projets.csv"');
+
+        return $response;
     }
 }

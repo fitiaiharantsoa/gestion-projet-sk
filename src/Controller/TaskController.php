@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Task;
 use App\Form\TaskType;
 use App\Repository\TaskRepository;
+use App\Service\ProjectLogService; // injection du service log
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +16,13 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/task')]
 final class TaskController extends AbstractController
 {
+    private ProjectLogService $projectLogService;
+
+    public function __construct(ProjectLogService $projectLogService)
+    {
+        $this->projectLogService = $projectLogService;
+    }
+
     #[Route('', name: 'app_task_index', methods: ['GET'])]
     public function index(TaskRepository $taskRepository): Response
     {
@@ -49,6 +57,11 @@ final class TaskController extends AbstractController
             $entityManager->persist($task);
             $entityManager->flush();
 
+            // Log création tâche (on log le projet lié si possible)
+            if ($task->getProject()) {
+                $this->projectLogService->log($task->getProject(), "Création de la tâche '{$task->getTitre()}'");
+            }
+
             return $this->redirectToRoute('app_task_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -75,6 +88,11 @@ final class TaskController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
+            // Log modification tâche
+            if ($task->getProject()) {
+                $this->projectLogService->log($task->getProject(), "Modification de la tâche '{$task->getTitre()}'");
+            }
+
             return $this->redirectToRoute('app_task_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -88,12 +106,20 @@ final class TaskController extends AbstractController
     public function delete(Request $request, Task $task, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$task->getId(), $request->request->get('_token'))) {
+            $project = $task->getProject(); // récupérer le projet avant suppression
+
             $entityManager->remove($task);
             $entityManager->flush();
+
+            if ($project) {
+                $this->projectLogService->log($project, "Suppression de la tâche '{$task->getTitre()}'");
+            }
         }
 
         return $this->redirectToRoute('app_task_index', [], Response::HTTP_SEE_OTHER);
     }
+
+    // Les autres méthodes (startTask, finishTask, updateStatus) restent identiques, tu peux y ajouter des logs si besoin
 
     #[Route('/{id}/start', name: 'app_task_start', methods: ['GET'])]
     public function startTask(Task $task, EntityManagerInterface $em): Response
@@ -105,6 +131,10 @@ final class TaskController extends AbstractController
 
         $task->setStatut('en cours');
         $em->flush();
+
+        if ($task->getProject()) {
+            $this->projectLogService->log($task->getProject(), "Démarrage de la tâche '{$task->getTitre()}' par {$user->getUserIdentifier()}");
+        }
 
         return $this->redirectToRoute('app_task_list');
     }
@@ -120,6 +150,10 @@ final class TaskController extends AbstractController
         $task->setStatut('terminée');
         $task->setProgression(100);
         $em->flush();
+
+        if ($task->getProject()) {
+            $this->projectLogService->log($task->getProject(), "Terminaison de la tâche '{$task->getTitre()}' par {$user->getUserIdentifier()}");
+        }
 
         return $this->redirectToRoute('app_task_list');
     }
@@ -147,6 +181,12 @@ final class TaskController extends AbstractController
 
         $task->setStatut($newStatus);
         $em->flush();
+
+        if ($task->getProject()) {
+            $user = $this->getUser();
+            $userName = $user ? $user->getUserIdentifier() : 'Utilisateur inconnu';
+            $this->projectLogService->log($task->getProject(), "Mise à jour du statut de la tâche '{$task->getTitre()}' à '{$newStatus}' par {$userName}");
+        }
 
         return $this->json(['success' => true]);
     }

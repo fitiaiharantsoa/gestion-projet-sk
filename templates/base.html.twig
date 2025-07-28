@@ -9,16 +9,11 @@
 
     {% block stylesheets %}
         {{ encore_entry_link_tags('app') }}
-        {# Styles spécifiques aux pages enfants #}
     {% endblock %}
 
-    {# Meta CSRF token pour AJAX sécurisé #}
     <meta name="csrf-token" content="{{ csrf_token('authenticate') }}">
 
-    {# SortableJS (pour drag & drop) #}
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-
-    {# Icônes (Phosphor) #}
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
     <style>
@@ -28,7 +23,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         nav.navbar {
-            background-color: #2C3E50; /* bleu foncé */
+            background-color: #2C3E50;
         }
         nav.navbar .navbar-brand,
         nav.navbar .nav-link {
@@ -37,7 +32,7 @@
             transition: color 0.3s ease;
         }
         nav.navbar .nav-link:hover {
-            color: #3498DB; /* bleu clair */
+            color: #3498DB;
         }
         nav.navbar .navbar-brand strong {
             font-size: 1.6rem;
@@ -53,7 +48,7 @@
             background-color: white;
         }
         .badge.bg-secondary {
-            background-color: #2980B9 !important; /* bleu moyen */
+            background-color: #2980B9 !important;
             color: white;
             font-weight: 600;
             text-transform: uppercase;
@@ -67,11 +62,24 @@
             padding-bottom: 1rem;
             border-top: 1px solid #DDE1E3;
         }
+        .position-relative {
+            position: relative !important;
+        }
+        .position-absolute {
+            position: absolute !important;
+        }
+        .top-0 { top: 0 !important; }
+        .start-100 { left: 100% !important; }
+        .translate-middle {
+            transform: translate(-50%, -50%) !important;
+        }
+        .rounded-pill {
+            border-radius: 50rem !important;
+        }
     </style>
 </head>
 <body class="{{ app.session.get('theme') ?? 'light' }}">
     
-    <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark px-3 mb-4">
         <a class="navbar-brand d-flex align-items-center" href="{{ path('app_dashboard') }}">
             <img src="{{ asset('images/sk-logo.png') }}" alt="Logo" class="navbar-logo">
@@ -104,8 +112,32 @@
                     <li class="nav-item">
                         <span class="badge bg-secondary">{{ app.user.roles ? app.user.roles|join(', ') : 'USER' }}</span>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ path('app_notification_index') }}" title="Notifications">🔔</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link position-relative" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
+                            🔔
+                            {% if notifications_unread is defined and notifications_unread|length > 0 %}
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    {{ notifications_unread|length }}
+                                    <span class="visually-hidden">notifications non lues</span>
+                                </span>
+                            {% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown" style="min-width: 300px;">
+                            {% if notifications_unread is defined and notifications_unread|length == 0 %}
+                                <li class="dropdown-item text-center text-muted">Aucune notification</li>
+                            {% elseif notifications_unread is defined %}
+                                {% for notification in notifications_unread %}
+                                    <li class="dropdown-item small">
+                                        {{ notification.message|raw }}<br>
+                                        <small class="text-muted">{{ notification.createdAt|date('d/m/Y H:i') }}</small>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                {% endfor %}
+                            {% else %}
+                                <li class="dropdown-item text-center text-muted">Chargement des notifications...</li>
+                            {% endif %}
+                            <li><a class="dropdown-item text-center" href="{{ path('app_notification_index') }}">Voir toutes les notifications</a></li>
+                        </ul>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ path('app_switch_theme') }}" title="Changer le thème">🌓</a>
@@ -122,18 +154,14 @@
         </div>
     </nav>
 
-    <!-- Contenu de la page -->
     <div class="container">
         {% block body %}{% endblock %}
     </div>
 
-    <!-- Pied de page -->
     <footer class="text-center">
         <small>© 2025 SK Groupe - Projet interne</small>
     </footer>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>

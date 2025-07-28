@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Notification;
-use App\Form\Notification1Type;
+use App\Form\NotificationType;
 use App\Repository\NotificationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,11 +22,29 @@ final class NotificationController extends AbstractController
         ]);
     }
 
+    #[Route('/mes', name: 'app_notification_mine', methods: ['GET'])]
+    public function myNotifications(NotificationRepository $notificationRepository): Response
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            throw $this->createAccessDeniedException('Vous devez être connecté pour voir vos notifications.');
+        }
+
+        $notifications = $notificationRepository->findBy(
+            ['recipient' => $user],
+            ['createdAt' => 'DESC']
+        );
+
+        return $this->render('notification/mine.html.twig', [
+            'notifications' => $notifications,
+        ]);
+    }
+
     #[Route('/new', name: 'app_notification_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $notification = new Notification();
-        $form = $this->createForm(Notification1Type::class, $notification);
+        $form = $this->createForm(NotificationType::class, $notification);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -53,7 +71,7 @@ final class NotificationController extends AbstractController
     #[Route('/{id}/edit', name: 'app_notification_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Notification $notification, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(Notification1Type::class, $notification);
+        $form = $this->createForm(NotificationType::class, $notification);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -71,7 +89,7 @@ final class NotificationController extends AbstractController
     #[Route('/{id}', name: 'app_notification_delete', methods: ['POST'])]
     public function delete(Request $request, Notification $notification, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$notification->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$notification->getId(), $request->request->get('_token'))) {
             $entityManager->remove($notification);
             $entityManager->flush();
         }

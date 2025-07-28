@@ -13,7 +13,8 @@ class ProjectFile
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'url')]
+    // Relation correcte avec l'entité Project
+    #[ORM\ManyToOne(inversedBy: 'projectFiles')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Project $projet = null;
 
@@ -22,6 +23,10 @@ class ProjectFile
 
     #[ORM\Column]
     private ?\DateTimeImmutable $dateUpload = null;
+
+    // Champ qui stocke l'URL ou le nom du fichier
+    #[ORM\Column(length: 255)]
+    private ?string $url = null;
 
     public function getId(): ?int
     {
@@ -60,6 +65,18 @@ class ProjectFile
     public function setDateUpload(\DateTimeImmutable $dateUpload): static
     {
         $this->dateUpload = $dateUpload;
+
+        return $this;
+    }
+
+    public function getUrl(): ?string
+    {
+        return $this->url;
+    }
+
+    public function setUrl(string $url): static
+    {
+        $this->url = $url;
 
         return $this;
     }
