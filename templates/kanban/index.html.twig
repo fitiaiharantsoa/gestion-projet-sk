@@ -50,8 +50,8 @@
 
 {% block body %}
 <div class="container my-4" data-controller="kanban">
-  <h1 class="mb-4">Kanban du projet : {{ project.titre }}</h1>
-
+  <h1 class="mb-4">Projet {{ project.titre }}</h1>
+  <a href="{{ path('app_project_show', {'id': project.id}) }}" class="btn mb-3">Détails</a>
   <div class="kanban-board">
     {% for status in ['à faire', 'en cours', 'bloquée', 'terminée'] %}
       <div class="kanban-column" data-status="{{ status }}">
@@ -62,7 +62,7 @@
         <div class="column-content" data-kanban-target="column" data-status="{{ status }}">
           {% for task in tasksByStatus[status] %}
             <div class="task-card" data-kanban-target="task" data-task-id="{{ task.id }}">
-              <h5>{{ task.titre }}</h5>
+              <h5> <a href="{{ path('app_task_edit', {'id': task.id}) }}" style="text-decoration: none;">{{ task.titre }}</a></h5>
               <p>{{ task.description|length > 100 ? task.description|slice(0, 100) ~ '...' : task.description }}</p>
               {% if task.dateEcheance %}
                 <small>Échéance : {{ task.dateEcheance|date('d/m/Y') }}</small>

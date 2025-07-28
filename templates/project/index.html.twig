@@ -65,12 +65,10 @@
                   <div class="progress m-2 " role="progressbar" aria-label="Basic example" aria-valuenow="{{ avgProgress }}" aria-valuemin="0" aria-valuemax="100">
                     <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: {{ avgProgress }}%">{{ avgProgress }} % </div>
                   </div>
-                  <a href="{{ path('app_project_show', {'id': project.id}) }}" class="card-link">Voir</a>
+                  <a href="{{ path('project_kanban', {'id': project.id}) }}" class="card-link">Voir</a>
                   <a href="{{ path('app_project_edit', {'id': project.id}) }}" class="card-link">Modifier</a>
                 </div>
               </div>
-
-            
         {% else %}
             <tr>
                 <td colspan="5">Aucun projet en cours.</td>
