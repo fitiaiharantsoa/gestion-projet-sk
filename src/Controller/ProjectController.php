@@ -18,11 +18,17 @@ use Symfony\Component\Security\Core\User\UserInterface;
 final class ProjectController extends AbstractController
 {
     #[Route('', name: 'app_project_index', methods: ['GET'])]
-    public function index(ProjectRepository $projectRepository, DepartementRepository $departementRepository,UserInterface $user): Response
+    public function index(ProjectRepository $projectRepository, DepartementRepository $departementRepository,UserInterface $user, Request $request): Response
     {
-        $departementDeUser = $departementRepository->findOneBy(['chef'=>$user->getId()]);
-
+        $departementDeUser = $departementRepository->findOneBy(['chef'=>$this->getUser()]);
+        $page = $request->query->getInt('page', 1);
+        $limit = 10;
+        $offset = ($page - 1) * $limit;
+        $current_page = $page;
+        $projectsReturn = $projectRepository->findBy([], ['createdAt' => 'DESC'], $limit, $offset);
         $projects = $projectRepository->findAll();
+        $totalProjects = $projectRepository->count([]);
+        $totalPages = ceil($totalProjects / $limit);
         $project_encours = $projectRepository->findBy(['statut'=>'en cours']);
         $project_a_faire = $projectRepository->findBy(['statut'=> 'à faire']);
         $project_bloque = $projectRepository->findBy(['statut'=> 'bloqué']);
@@ -82,7 +88,7 @@ final class ProjectController extends AbstractController
         $progressionGlobale = ($totalCount > 0) ? round($totalSomme / $totalCount) : 0;
 
         return $this->render('project/index.html.twig', [
-            'projects' => $projects,
+            'projects' => $projectsReturn,
             'progressionParUser' => $progressionParUser,
             'progressionParDepartement' => $progressionParDepartement,
             'progressionGlobale' => $progressionGlobale,
@@ -94,6 +100,9 @@ final class ProjectController extends AbstractController
             'total_bloque'=>count($project_bloque),
             'total_termine'=>count($project_termine),
             'departement_user'=>$departementDeUser,
+            'current_page'=>$current_page,
+            'total_pages'=>$totalPages,
+            'total_projects'=>$totalProjects,
         ]);
     }
 

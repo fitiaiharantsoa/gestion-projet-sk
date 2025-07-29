@@ -3,26 +3,90 @@
 {% block title %}Mes Tâches{% endblock %}
 
 {% block body %}
-<h1>Mes Tâches</h1>
+<h1 class="text-center">Mes Tâches</h1>
 
-<div class="task-list">
+<div class="task-list" style="display: flex; justify-content: center; flex-wrap: wrap;">
     {% for task in tasks %}
         <div class="task-card">
             <div class="task-header">
-            <strong>[TASK #{{ '%03d'|format(task.id) }}]</strong>
+            <strong><a href="{{ path('app_task_show', {id: task.id}) }}" title="Détails sur la tâche">Tâche {{ task.id }}</a></strong>
             </div>
-            <p>📝 <strong>Titre :</strong> {{ task.titre }}</p>
-            <p>📄 <strong>Description :</strong> {{ task.description|length > 100 ? task.description|slice(0, 100) ~ '...' : task.description }}</p>
-            <p>📅 <strong>Deadline :</strong> {{ task.dateEcheance ? task.dateEcheance|date('d/m/Y H:i') : 'Non définie' }}</p>
-            <p>👤 <strong>Assigné :</strong> {{ task.assigne ? task.assigne.userIdentifier : 'Non assigné' }}</p>
-            <p>✉️ <strong>Demandeur :</strong> {{ task.createur ? task.createur.userIdentifier : 'Inconnu' }}</p>
-            <p>📌 <strong>Statut :</strong> {{ task.statut|capitalize }}</p>
+            <p><strong>Titre :</strong> {{ task.titre }}</p>
+            <p><strong>Description :</strong> {{ task.description|length > 100 ? task.description|slice(0, 100) ~ '...' : task.description }}</p>
+            <p><strong>Deadline :</strong> {{ task.dateEcheance ? task.dateEcheance|date('d/m/Y H:i') : 'Non définie' }}</p>
+            <p><strong>Assigné :</strong> {{ task.assigne ? task.assigne.userIdentifier : 'Non assigné' }}</p>
+            <p><strong>Demandeur :</strong> {{ task.createur ? task.createur.userIdentifier : 'Inconnu' }}</p>
+            <p><strong>Statut :</strong> {{ task.statut|capitalize }}</p>
         </div>
     {% else %}
         <p>Aucune tâche assignée.</p>
     {% endfor %}
+    
 </div>
+<div class="pagination mt-5" style="display: flex; justify-content: center;">
+    <nav aria-label="Page navigation">
+        <ul class="pagination    ">
+            {% if current_page > 1 %}
 
+            <li class="page-item">
+                <a class="page-link" href="{{ path('app_task_list', {'page': current_page - 1}) }}"
+                    aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% endif %}
+            {% if current_page > 2 %}
+
+            <li class="page-item">
+                <a class="page-link" href="{{ path('app_task_list', {'page': current_page - 2}) }}"
+                    aria-label="Previous">
+                    <span aria-hidden="true">{{ current_page - 2 }}</span>
+                </a>
+            </li>
+            {% endif %}
+            {% if current_page > 1 %}
+
+            <li class="page-item">
+                <a class="page-link" href="{{ path('app_task_list', {'page': current_page - 1}) }}"
+                    aria-label="Previous">
+                    <span aria-hidden="true">{{ current_page - 1 }}</span>
+                </a>
+            </li>
+            {% endif %}
+
+            <li class="page-item active" aria-current="page">
+                <a class="page-link" href="{{ path('app_task_list', {'page': current_page }) }}">{{ current_page }}</a>
+            </li>
+
+            {% if current_page < total_pages %}
+            <li class="page-item">
+                <a class="page-link" href="{{ path('app_task_list', {'page': current_page + 1}) }}"
+                    aria-label="Previous">
+                    <span aria-hidden="true">{{ current_page + 1 }}</span>
+                </a>
+            </li>
+            {% endif %}
+            {% if current_page+2 < total_pages %}
+            <li class="page-item">
+                <a class="page-link" href="{{ path('app_task_list', {'page': current_page + 2}) }}"
+                    aria-label="Previous">
+                    <span aria-hidden="true">{{ current_page + 2 }}</span>
+                </a>
+            </li>
+            {% endif %}
+            
+            {% if current_page < total_pages %} <li class="page-item">
+                <a class="page-link" href="{{ path('app_task_list', {'page': current_page + 1}) }}"
+                    aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+                </li>
+                {% endif %}
+
+        </ul>
+    </nav>
+    
+</div>
 <style>
 .task-list {
     display: flex;

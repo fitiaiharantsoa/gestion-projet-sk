@@ -39,14 +39,20 @@ final class TaskController extends AbstractController
     public function myTasks(TaskRepository $taskRepository, Request $request): Response
     {
         $user = $this->getUser();
+        $page = $request->query->getInt('page', 1);
+        $limit = 10;
+        $offset = ($page - 1) * $limit;
         if (!$user) {
             throw $this->createAccessDeniedException('Vous devez être connecté pour voir vos tâches.');
         }
-
-        $tasks = $taskRepository->findBy(['assigne' => $user]);
+        
+        $tasks = $taskRepository->findBy(['assigne' => $user], ['id'=>"desc"], $limit, $offset);
 
         return $this->render('task/my_tasks.html.twig', [
             'tasks' => $tasks,
+            'task_total'=> count($tasks),
+            'current_page' => $page,
+            'total_pages' => ceil(count($tasks) / $limit),
         ]);
     }
 
@@ -58,6 +64,9 @@ final class TaskController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $user = $this->getUser();
+            $task->setCreateur($user);
+            $task->setCreatedAt(new \DateTimeImmutable('now'));
             $entityManager->persist($task);
             $entityManager->flush();
 

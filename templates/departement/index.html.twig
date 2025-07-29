@@ -10,6 +10,7 @@
             <tr>
                 <th>Id</th>
                 <th>Nom</th>
+                <th>Chef</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -18,6 +19,7 @@
             <tr>
                 <td>{{ departement.id }}</td>
                 <td>{{ departement.nom }}</td>
+                <td>{{ departement.chef }}</td>
                 <td>
                     <a href="{{ path('app_departement_show', {'id': departement.id}) }}">Voir</a>
                     <a href="{{ path('app_departement_edit', {'id': departement.id}) }}">Modifier</a>
