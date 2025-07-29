@@ -153,6 +153,7 @@
         onEnd(evt) {
           const taskId = evt.item.dataset.taskId;
           const newStatus = evt.from.dataset.status;
+          console.log('new status ', evt.from.dataset.status)
 
           // Mettre à jour le statut de la tâche via AJAX
           fetch(`/task/${taskId}/update-status`, {
@@ -164,6 +165,7 @@
           })
           .then(response => response.json())
           .then(data => {
+            console.log('drpo')
             if (!data.success) {
               alert('Erreur lors de la mise à jour du statut');
             }

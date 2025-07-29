@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}ProjectFile{% endblock %}
+{% block title %}Fichier de projet{% endblock %}
 
 {% block body %}
-    <h1>ProjectFile</h1>
+    <h1>Fichier de Projet</h1>
 
     <table class="table">
         <tbody>
@@ -16,15 +16,15 @@
                 <td>{{ project_file.type }}</td>
             </tr>
             <tr>
-                <th>DateUpload</th>
+                <th>Date d'upload</th>
                 <td>{{ project_file.dateUpload ? project_file.dateUpload|date('Y-m-d H:i:s') : '' }}</td>
             </tr>
         </tbody>
     </table>
 
-    <a href="{{ path('app_project_file_index') }}">back to list</a>
+    <a href="{{ path('app_project_file_index') }}">retour</a>
 
-    <a href="{{ path('app_project_file_edit', {'id': project_file.id}) }}">edit</a>
+    <a href="{{ path('app_project_file_edit', {'id': project_file.id}) }}">Modifier</a>
 
     {{ include('project_file/_delete_form.html.twig') }}
 {% endblock %}

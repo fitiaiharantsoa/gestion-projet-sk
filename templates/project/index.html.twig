@@ -29,12 +29,12 @@
 
 {% if 'ROLE_BU' in app.user.roles %}
     {% set depId = departement_user ? departement_user.id : null %}
-    <h3>Your Department's Progression: {{ progressionParDepartement[depId]|default(0) }}%</h3>
+    <h3>Progression de votre département: {{ progressionParDepartement[depId]|default(0) }}%</h3>
 {% endif %}
 
 {% if 'ROLE_USER' in app.user.roles %}
     {% set userId = app.user.id %}
-    <h3>Your Total Progression: {{ progressionParUser[userId]|default(0) }}%</h3>
+    <h3>Progression total: {{ progressionParUser[userId]|default(0) }}%</h3>
 {% endif %}
 
 

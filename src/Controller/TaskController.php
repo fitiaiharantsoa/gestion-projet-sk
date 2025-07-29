@@ -16,15 +16,27 @@ use Symfony\Component\Routing\Annotation\Route;
 final class TaskController extends AbstractController
 {
     #[Route('', name: 'app_task_index', methods: ['GET'])]
-    public function index(TaskRepository $taskRepository): Response
+    public function index(TaskRepository $taskRepository, Request $request): Response
     {
+        $page = $request->query->getInt('page', 1);
+        $limit = 9;
+
+        $task = $taskRepository->findPaginatedTask($page, $limit);
+        $totalTasks = $taskRepository->countAllTask();
+        $totalPages = ceil($totalTasks / $limit);
+        $currentPage = $page;
+
+
         return $this->render('task/index.html.twig', [
-            'tasks' => $taskRepository->findAll(),
+            'tasks' => $task,
+            'current_page'=>$currentPage,
+            'total_pages' => $totalPages,
+            'total_task'=>$totalTasks
         ]);
     }
 
     #[Route('/my-tasks', name: 'app_task_list', methods: ['GET'])]
-    public function myTasks(TaskRepository $taskRepository): Response
+    public function myTasks(TaskRepository $taskRepository, Request $request): Response
     {
         $user = $this->getUser();
         if (!$user) {

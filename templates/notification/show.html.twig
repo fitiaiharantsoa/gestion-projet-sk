@@ -16,19 +16,19 @@
                 <td>{{ notification.message }}</td>
             </tr>
             <tr>
-                <th>Seen</th>
+                <th>Vu</th>
                 <td>{{ notification.seen ? 'Yes' : 'No' }}</td>
             </tr>
             <tr>
-                <th>CreatedAt</th>
+                <th>Date de création</th>
                 <td>{{ notification.createdAt ? notification.createdAt|date('Y-m-d H:i:s') : '' }}</td>
             </tr>
         </tbody>
     </table>
 
-    <a href="{{ path('app_notification_index') }}">back to list</a>
+    <a href="{{ path('app_notification_index') }}">Retour</a>
 
-    <a href="{{ path('app_notification_edit', {'id': notification.id}) }}">edit</a>
+    <a href="{{ path('app_notification_edit', {'id': notification.id}) }}">Modifier</a>
 
     {{ include('notification/_delete_form.html.twig') }}
 {% endblock %}
