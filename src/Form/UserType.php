@@ -17,6 +17,12 @@ class UserType extends AbstractType
         $builder
             ->add('email', EmailType::class, [
                 'label' => 'Adresse Email',
+                
+                'attr'=>[
+                    'class'=>'form-control',
+                    'placeholder' => '',
+                ],
+                
             ])
             ->add('roles', ChoiceType::class, [
                 'label' => 'Rôles',
@@ -32,10 +38,16 @@ class UserType extends AbstractType
             ->add('isVerified', CheckboxType::class, [
                 'label' => 'Utilisateur vérifié ?',
                 'required' => false,
+                'attr'=>['class'=>'form-check-input'],
+                'label_attr'=>['class'=>'form-check-label'],
+                'row_attr'=> ['class' => 'form-check mb-3'],
             ])
             ->add('isEmailAuthEnabled', CheckboxType::class, [
                 'label' => 'Activer l’authentification 2FA par email',
                 'required' => false,
+                'attr'=>['class'=>'form-check-input'],
+                'label_attr'=>['class'=>'form-check-label'],
+                'row_attr'=> ['class' => 'form-check mb-3'],
             ]);
     }
 

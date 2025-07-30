@@ -1,12 +1,12 @@
 <?php
-namespace App\Security;
+namespace App\EventListener;
 
 use App\Repository\UserTrustedDeviceRepository;
 use Scheb\TwoFactorBundle\Security\TwoFactor\Condition\TwoFactorConditionInterface;
 use Scheb\TwoFactorBundle\Security\TwoFactor\AuthenticationContextInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-
-class TrustedDeviceCondition implements TwoFactorConditionInterface
+// TrustedDeviceBypassListener
+class TrustedDeviceBypassListener implements TwoFactorConditionInterface
 {
     public function __construct(
         private RequestStack $requestStack,

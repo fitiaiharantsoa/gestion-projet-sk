@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modifier le fichier projet{% endblock %}
+{% block title %}Modifier le fichier project{% endblock %}
 
 {% block body %}
     <h1>Modifier un fichier</h1>
 
-    {{ include('projet_file/_form.html.twig', {'form': form, 'button_label': 'Mettre à jour'}) }}
+    {{ include('project_file/_form.html.twig', {'form': form, 'button_label': 'Mettre à jour'}) }}
 
-    <a href="{{ path('app_projet_file_index') }}">Retour à la liste</a>
+    <a href="{{ path('app_project_file_index') }}">Retour à la liste</a>
 {% endblock %}

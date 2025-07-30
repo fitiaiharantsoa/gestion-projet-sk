@@ -25,7 +25,14 @@ class RegistrationFormType extends AbstractType
                         'message' => 'You should agree to our terms.',
                     ]),
                 ],
+                'attr'=>[
+                    'class'=>'form-check-input'
+                ],
+                'label_attr'=>['class'=>'form-check-label'],
+                'row_attr' => ['class' => 'form-check mb-3'],
             ])
+            ->add('prenom')
+            ->add('nom')
             ->add('plainPassword', PasswordType::class, [
                 // instead of being set onto the object directly,
                 // this is read and encoded in the controller

@@ -1,5 +1,6 @@
 parameters:
     project_files_directory: '%kernel.project_dir%/public/uploads/project_files'
+    uploads_directory: '%kernel.project_dir%/public/uploads'
 
 services:
     _defaults:
@@ -31,3 +32,5 @@ services:
     App\EventSubscriber\NotificationSubscriber:
         tags:
             - { name: kernel.event_subscriber }
+
+        

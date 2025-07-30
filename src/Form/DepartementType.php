@@ -11,13 +11,25 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DepartementType extends AbstractType
 {
+    private function AfficherRole(Array $role){
+        switch ($role[0]) {
+            case 'ROLE_PDG':
+                return '(PDG)';
+            case 'ROLE_BU':
+                return '(Chef de BU)';
+            default:
+                return '(Collaborateur)';
+        }
+    }
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('nom')
             ->add('chef', EntityType::class, [
                 'class' => User::class,
-                'choice_label' => 'id',
+                'choice_label' => function (User $user) {
+                    return $user->getPrenom() . ' ' . $user->getNom() .' '. $this->AfficherRole($user->getRoles());
+                },
             ])
         ;
     }

@@ -6,16 +6,16 @@
     <h1>Détail du fichier projet</h1>
 
     <ul>
-        <li><strong>Type :</strong> {{ projet_file.type }}</li>
-        <li><strong>Date :</strong> {{ projet_file.dateUpload ? projet_file.dateUpload|date('d/m/Y') : '' }}</li>
-        <li><strong>Projet :</strong> {{ projet_file.projet.titre }}</li>
+        <li><strong>Type :</strong> {{ project_file.type }}</li>
+        <li><strong>Date :</strong> {{ project_file.dateUpload ? project_file.dateUpload|date('d/m/Y') : '' }}</li>
+        <li><strong>Project :</strong> {{ project_file.project.titre }}</li>
     </ul>
 
-    <a href="{{ path('app_projet_file_edit', {'id': projet_file.id}) }}" class="btn btn-warning">Modifier</a>
-    <form method="post" action="{{ path('app_projet_file_delete', {'id': projet_file.id}) }}" style="display:inline;" onsubmit="return confirm('Confirmer la suppression ?');">
-        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ projet_file.id) }}">
+    <a href="{{ path('app_project_file_edit', {'id': project_file.id}) }}" class="btn btn-warning">Modifier</a>
+    <form method="post" action="{{ path('app_project_file_delete', {'id': project_file.id}) }}" style="display:inline;" onsubmit="return confirm('Confirmer la suppression ?');">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ project_file.id) }}">
         <button class="btn btn-danger">Supprimer</button>
     </form>
 
-    <a href="{{ path('app_projet_file_index') }}" class="btn btn-secondary">Retour à la liste</a>
+    <a href="{{ path('app_project_file_index') }}" class="btn btn-secondary">Retour à la liste</a>
 {% endblock %}

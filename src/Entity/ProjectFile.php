@@ -16,7 +16,7 @@ class ProjectFile
     // Relation correcte avec l'entité Project
     #[ORM\ManyToOne(inversedBy: 'projectFiles')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Project $projet = null;
+    private ?Project $project = null;
 
     #[ORM\Column(length: 50)]
     private ?string $type = null;
@@ -24,24 +24,29 @@ class ProjectFile
     #[ORM\Column]
     private ?\DateTimeImmutable $dateUpload = null;
 
-    // Champ qui stocke l'URL ou le nom du fichier
+    // Stocke l'URL ou le nom du fichier
     #[ORM\Column(length: 255)]
     private ?string $url = null;
+
+    #[ORM\Column(type: 'string', length: 255)]
+    private ?string $filename = null;
+
+    #[ORM\Column(type: 'datetime_immutable')]
+    private ?\DateTimeImmutable $uploadedAt = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getProjet(): ?Project
+    public function getProject(): ?Project
     {
-        return $this->projet;
+        return $this->project;
     }
 
-    public function setProjet(?Project $projet): static
+    public function setProject(?Project $project): static
     {
-        $this->projet = $projet;
-
+        $this->project = $project;
         return $this;
     }
 
@@ -53,7 +58,6 @@ class ProjectFile
     public function setType(string $type): static
     {
         $this->type = $type;
-
         return $this;
     }
 
@@ -65,7 +69,6 @@ class ProjectFile
     public function setDateUpload(\DateTimeImmutable $dateUpload): static
     {
         $this->dateUpload = $dateUpload;
-
         return $this;
     }
 
@@ -77,7 +80,28 @@ class ProjectFile
     public function setUrl(string $url): static
     {
         $this->url = $url;
+        return $this;
+    }
 
+    public function getFilename(): ?string
+    {
+        return $this->filename;
+    }
+
+    public function setFilename(string $filename): static
+    {
+        $this->filename = $filename;
+        return $this;
+    }
+
+    public function getUploadedAt(): ?\DateTimeImmutable
+    {
+        return $this->uploadedAt;
+    }
+
+    public function setUploadedAt(\DateTimeImmutable $uploadedAt): static
+    {
+        $this->uploadedAt = $uploadedAt;
         return $this;
     }
 }

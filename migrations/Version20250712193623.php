@@ -22,8 +22,7 @@ final class Version20250712193623 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('CREATE TABLE departement (id SERIAL NOT NULL, chef_id INT NOT NULL, nom VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_C1765B63150A48F1 ON departement (chef_id)');
-        $this->addSql('ALTER TABLE departement ADD CONSTRAINT FK_C1765B63150A48F1 FOREIGN KEY (chef_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
-       
+        $this->addSql('ALTER TABLE departement ADD CONSTRAINT FK_C1765B63150A48F1 FOREIGN KEY (chef_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');  
         $this->addSql('ALTER TABLE project ALTER updated_at SET NOT NULL');
         $this->addSql('ALTER TABLE project ADD CONSTRAINT FK_2FB3D0EE53C59D72 FOREIGN KEY (responsable_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('CREATE INDEX IDX_2FB3D0EE53C59D72 ON project (responsable_id)');

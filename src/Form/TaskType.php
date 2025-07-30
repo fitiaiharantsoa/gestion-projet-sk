@@ -26,16 +26,16 @@ class TaskType extends AbstractType
                 'label' => '📅 Deadline',
                 'widget' => 'single_text'
             ])
-            ->add('assigne', EntityType::class, [
-                'class' => User::class,
-                'choice_label' => fn(User $user) => $user->getNomComplet(),
-                'label' => '👤 Assigné',
-            ])
-            ->add('demandeur', EntityType::class, [
-                'class' => User::class,
-                'choice_label' => fn(User $user) => $user->getNomComplet(),
-                'label' => '✉️ Demandeur',
-            ])
+            // ->add('assigne', EntityType::class, [
+            //     'class' => User::class,
+            //     'choice_label' => fn(User $user) => $user->getNom(),
+            //     'label' => '👤 Assigné',
+            // ])
+            // ->add('demandeur', EntityType::class, [
+            //     'class' => User::class,
+            //     'choice_label' => fn(User $user) => $user->getNom(),
+            //     'label' => '✉️ Demandeur',
+            // ])
             ->add('statut', null, [
                 'label' => '📌 Statut'
             ])

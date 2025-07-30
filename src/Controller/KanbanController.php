@@ -3,8 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Task;
+use App\Entity\User;
+use DateTimeImmutable;
 use App\Repository\TaskRepository;
 use App\Repository\ProjectRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,15 +19,18 @@ class KanbanController extends AbstractController
     private EntityManagerInterface $entityManager;
     private TaskRepository $taskRepository;
     private ProjectRepository $projectRepository;
+    private UserRepository $userRepository;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         TaskRepository $taskRepository,
-        ProjectRepository $projectRepository
+        ProjectRepository $projectRepository,
+        UserRepository $userRepository
     ) {
         $this->entityManager = $entityManager;
         $this->taskRepository = $taskRepository;
         $this->projectRepository = $projectRepository;
+        $this->userRepository = $userRepository;
     }
 
     /**
@@ -59,6 +65,7 @@ class KanbanController extends AbstractController
             'project' => $project,
             'tasksByStatus' => $tasksByStatus,
             'allTasks' => $tasks,
+            'users'=> $this->userRepository->findAll(),
         ]);
     }
 
@@ -66,7 +73,7 @@ class KanbanController extends AbstractController
      * Ajouter une nouvelle tâche via formulaire POST (dans modal)
      */
     #[Route('/project/{id}/kanban/add-task', name: 'kanban_add_task', methods: ['POST'])]
-    public function addTask(Request $request, int $id): Response
+    public function addTask(Request $request, int $id ): Response
     {
         $project = $this->projectRepository->find($id);
         if (!$project) {
@@ -77,6 +84,7 @@ class KanbanController extends AbstractController
         $description = $request->request->get('description');
         $priority = $request->request->get('priority');
         $dueDate = $request->request->get('due_date');
+        $assigne = $request->request->get('assigne');
 
         $task = new Task();
         $task->setTitre($title);
@@ -85,6 +93,11 @@ class KanbanController extends AbstractController
         $task->setDateEcheance($dueDate ? new \DateTime($dueDate) : null);
         $task->setStatut('à faire'); // statut par défaut
         $task->setProject($project);
+        $user= $this->userRepository->find($assigne);
+        $task->setAssigne($user);
+        $currentDate = new \DateTime('now');   
+        $dateTimeImmutable = DateTimeImmutable::createFromMutable($currentDate);
+        $task->setCreatedAt($dateTimeImmutable);
 
         $this->entityManager->persist($task);
         $this->entityManager->flush();
