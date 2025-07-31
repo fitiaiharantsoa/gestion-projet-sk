@@ -63,6 +63,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[ORM\OneToMany(targetEntity: Departement::class, mappedBy: 'chef')]
     private Collection $departements;
 
+    #[ORM\ManyToOne(inversedBy: 'users')]
+    private ?Departement $departement = null;
+
     public function __construct()
     {
         $this->projectLogs = new ArrayCollection();
@@ -253,5 +256,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     public function __toString(): string
     {
         return $this->getFullName();
+    }
+
+    public function getDepartement(): ?Departement
+    {
+        return $this->departement;
+    }
+
+    public function setDepartement(?Departement $departement): static
+    {
+        $this->departement = $departement;
+
+        return $this;
     }
 }

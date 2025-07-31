@@ -17,11 +17,16 @@ class ProjectFile
     #[ORM\JoinColumn(nullable: false)]
     private ?Project $projet = null;
 
-    #[ORM\Column(length: 50)]
-    private ?string $type = null;
+   
 
     #[ORM\Column]
     private ?\DateTimeImmutable $dateUpload = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $filename = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $filepath = null;
 
     public function getId(): ?int
     {
@@ -40,18 +45,6 @@ class ProjectFile
         return $this;
     }
 
-    public function getType(): ?string
-    {
-        return $this->type;
-    }
-
-    public function setType(string $type): static
-    {
-        $this->type = $type;
-
-        return $this;
-    }
-
     public function getDateUpload(): ?\DateTimeImmutable
     {
         return $this->dateUpload;
@@ -60,6 +53,30 @@ class ProjectFile
     public function setDateUpload(\DateTimeImmutable $dateUpload): static
     {
         $this->dateUpload = $dateUpload;
+
+        return $this;
+    }
+
+    public function getFilename(): ?string
+    {
+        return $this->filename;
+    }
+
+    public function setFilename(string $filename): static
+    {
+        $this->filename = $filename;
+
+        return $this;
+    }
+
+    public function getFilepath(): ?string
+    {
+        return $this->filepath;
+    }
+
+    public function setFilepath(string $filepath): static
+    {
+        $this->filepath = $filepath;
 
         return $this;
     }

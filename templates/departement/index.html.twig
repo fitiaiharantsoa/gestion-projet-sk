@@ -11,6 +11,8 @@
                 <th>Id</th>
                 <th>Nom</th>
                 <th>Chef</th>
+                <th>Nombre Membre</th>
+                <th>Nombre de projet</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -20,6 +22,9 @@
                 <td>{{ departement.id }}</td>
                 <td>{{ departement.nom }}</td>
                 <td>{{ departement.chef }}</td>
+                <td>{{ nbr_membre[departement.id] }}</td>
+                <td>{{ nbr_projet[departement.id] }}</td>
+
                 <td>
                     <a href="{{ path('app_departement_show', {'id': departement.id}) }}">Voir</a>
                     <a href="{{ path('app_departement_edit', {'id': departement.id}) }}">Modifier</a>
@@ -34,4 +39,69 @@
     </table>
 
     <a href="{{ path('app_departement_new') }}">Nouveau</a>
+
+    <div class="pagination mt-5" style="display: flex; justify-content: center;">
+        <nav aria-label="Page navigation">
+            <ul class="pagination    ">
+                {% if current_page > 1 %}
+    
+                <li class="page-item">
+                    <a class="page-link" href="{{ path('app_departement_index', {'page': current_page - 1}) }}"
+                        aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+                {% if current_page > 2 %}
+    
+                <li class="page-item">
+                    <a class="page-link" href="{{ path('app_departement_index', {'page': current_page - 2}) }}"
+                        aria-label="Previous">
+                        <span aria-hidden="true">{{ current_page - 2 }}</span>
+                    </a>
+                </li>
+                {% endif %}
+                {% if current_page > 1 %}
+    
+                <li class="page-item">
+                    <a class="page-link" href="{{ path('app_departement_index', {'page': current_page - 1}) }}"
+                        aria-label="Previous">
+                        <span aria-hidden="true">{{ current_page - 1 }}</span>
+                    </a>
+                </li>
+                {% endif %}
+    
+                <li class="page-item active" aria-current="page">
+                    <a class="page-link" href="{{ path('app_departement_index', {'page': current_page }) }}">{{ current_page }}</a>
+                </li>
+    
+                {% if current_page < total_pages %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ path('app_departement_index', {'page': current_page + 1}) }}"
+                        aria-label="Previous">
+                        <span aria-hidden="true">{{ current_page + 1 }}</span>
+                    </a>
+                </li>
+                {% endif %}
+                {% if current_page+2 < total_pages %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ path('app_departement_index', {'page': current_page + 2}) }}"
+                        aria-label="Previous">
+                        <span aria-hidden="true">{{ current_page + 2 }}</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% if current_page < total_pages %} <li class="page-item">
+                    <a class="page-link" href="{{ path('app_departement_index', {'page': current_page + 1}) }}"
+                        aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                    </li>
+                    {% endif %}
+    
+            </ul>
+        </nav>
+        
+    </div>
 {% endblock %}

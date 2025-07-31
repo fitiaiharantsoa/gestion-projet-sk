@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250713141615 extends AbstractMigration
+final class Version20250731105731 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,15 +20,13 @@ final class Version20250713141615 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE "user" ADD is_email_auth_enabled BOOLEAN DEFAULT FALSE');
-        $this->addSql('ALTER TABLE "user" ADD auth_code VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE project_file ADD filename VARCHAR(255) NOT NULL');
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE "user" DROP is_email_auth_enabled');
-        $this->addSql('ALTER TABLE "user" DROP auth_code');
-       
+        $this->addSql('CREATE SCHEMA public');
+        $this->addSql('ALTER TABLE project_file DROP filename');
     }
 }

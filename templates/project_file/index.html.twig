@@ -9,7 +9,8 @@
         <thead>
             <tr>
                 <th>Id</th>
-                <th>Type</th>
+                <th>Nom du fichier</th>
+                <th>Projet</th>
                 <th>Date d'upload</th>
                 <th>actions</th>
             </tr>
@@ -18,10 +19,12 @@
         {% for project_file in project_files %}
             <tr>
                 <td>{{ project_file.id }}</td>
-                <td>{{ project_file.type }}</td>
+                <td>{{ project_file.filename }}</td>
+                <td>{{ project_file.projet.titre }}</td>
                 <td>{{ project_file.dateUpload ? project_file.dateUpload|date('Y-m-d H:i:s') : '' }}</td>
                 <td>
-                    <a href="{{ path('app_project_file_show', {'id': project_file.id}) }}">voir</a>
+                    {# <a href="{{ path('app_project_file_show', {'id': project_file.id}) }}">voir</a> #}
+                    <a href="/uploads/file/{{ project_file.filepath }}">voir</a>
                     <a href="{{ path('app_project_file_edit', {'id': project_file.id}) }}">Modifier</a>
                 </td>
             </tr>

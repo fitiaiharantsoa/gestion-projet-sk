@@ -31,7 +31,11 @@
             {{ form_errors(registrationForm.nom) }}
         </div>
 
-        
+        <div class="form-floating mb-3">
+            {{ form_widget(registrationForm.departement, {'attr': {'class': 'form-select'}}) }}
+            {{ form_label(registrationForm.departement) }}
+            {{ form_errors(registrationForm.departement) }}
+        </div>
 
         <div class="form-floating mb-3">
             {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control'}}) }}
