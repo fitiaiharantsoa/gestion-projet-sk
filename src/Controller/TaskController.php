@@ -24,25 +24,43 @@ final class TaskController extends AbstractController
     }
 
     #[Route('', name: 'app_task_index', methods: ['GET'])]
-    public function index(TaskRepository $taskRepository): Response
+    public function index(TaskRepository $taskRepository, Request $request): Response
     {
+        $page = $request->query->getInt('page', 1);
+        $limit = 9;
+
+        $task = $taskRepository->findPaginatedTask($page, $limit);
+        $totalTasks = $taskRepository->countAllTask();
+        $totalPages = ceil($totalTasks / $limit);
+        $currentPage = $page;
+
+
         return $this->render('task/index.html.twig', [
-            'tasks' => $taskRepository->findAll(),
+            'tasks' => $task,
+            'current_page'=>$currentPage,
+            'total_pages' => $totalPages,
+            'total_task'=>$totalTasks
         ]);
     }
 
     #[Route('/my-tasks', name: 'app_task_list', methods: ['GET'])]
-    public function myTasks(TaskRepository $taskRepository): Response
+    public function myTasks(TaskRepository $taskRepository, Request $request): Response
     {
         $user = $this->getUser();
+        $page = $request->query->getInt('page', 1);
+        $limit = 10;
+        $offset = ($page - 1) * $limit;
         if (!$user) {
             throw $this->createAccessDeniedException('Vous devez être connecté pour voir vos tâches.');
         }
-
-        $tasks = $taskRepository->findBy(['assigne' => $user]);
+        
+        $tasks = $taskRepository->findBy(['assigne' => $user], ['id'=>"desc"], $limit, $offset);
 
         return $this->render('task/my_tasks.html.twig', [
             'tasks' => $tasks,
+            'task_total'=> count($tasks),
+            'current_page' => $page,
+            'total_pages' => ceil(count($tasks) / $limit),
         ]);
     }
 
@@ -54,6 +72,9 @@ final class TaskController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $user = $this->getUser();
+            $task->setCreateur($user);
+            $task->setCreatedAt(new \DateTimeImmutable('now'));
             $entityManager->persist($task);
             $entityManager->flush();
 

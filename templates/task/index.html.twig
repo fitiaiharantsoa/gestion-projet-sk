@@ -3,29 +3,160 @@
 {% block title %}Task List{% endblock %}
 
 {% block body %}
-<h1>Task List</h1>
-<table>
+{% if 'ROLE_PDG' in app.user.roles %}
+    <h1 style="text-align: center;">Listes de tous les tâches</h1>
+    <h6 style="text-align: center;  font-size: smaller;">
+        <a href="{{ path('app_task_list') }}" title="La liste des tâches qui vous sont attribuées">Vos tâches</a>
+    </h6>
+{% else %}
+    <h1 style="text-align: center;">Lites de vos tâches</h1>
+{% endif %}
+
+
+
+
+
+{# <table class="table">
     <thead>
         <tr>
             <th>ID</th>
-            <th>Title</th>
+            <th>Titre</th>
             <th>Status</th>
+            <th>Assigné à</th>
+            <th>Projet asscoié</th>
             <th>Actions</th>
         </tr>
     </thead>
-    <tbody>
-        {% for task in tasks %}
-            <tr>
+    <tbody> #}
+        <div class="" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;">
+            {% for task in tasks %}
+            {# <tr>
                 <td>{{ task.id }}</td>
                 <td>{{ task.titre }}</td>
                 <td>{{ task.statut }}</td>
+                <td><a class="btn " href="{{ path('user_profile', {id: task.assigne.id}) }}">{{ task.assigne.nom }} {{
+                        task.assigne.prenom }}</a></td>
+                <td><a class="btn " href="{{ path('project_kanban', {id: task.project.id}) }}">{{ task.project.titre }}
+                    </a></td>
                 <td>
-                    <a href="{{ path('app_task_show', { id: task.id }) }}">View</a>
-                    <a href="{{ path('app_task_edit', { id: task.id }) }}">Edit</a>
+                    <a href="{{ path('app_task_show', { id: task.id }) }}">Voir</a>
+                    <a href="{{ path('app_task_edit', { id: task.id }) }}">Modifier</a>
                 </td>
-            </tr>
-        {% endfor %}
+            </tr> #}
+            <div class="card text-center" style="width: 22rem;">
+                <div class="card-header" >
+                    <ul class="nav nav-pills card-header-pills" >
+                        <li class="nav-item">
+                            <a class="nav-link " href="{{ path('app_task_edit', { id: task.id }) }}">Modifier</a>
+                        </li>
+                        <li class="nav-item">
+                            {# <a class="nav-link text-danger"
+                                href="{{ path('app_task_delete', { id: task.id }) }}">Supprimer</a> #}
+                            {{ include('task/_delete_form.html.twig') }}
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link disabled" aria-disabled="true">{{task.statut}}</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body" style="text-align: left;">
+                    <h5 class="card-title"> {{ task.titre}} </h5>
+                    <p class="card-text">
+                        <strong>Assigné à:</strong> <a class="btn "
+                            href="{{ path('user_profile', {id: task.assigne.id}) }}">{{ task.assigne.nom }} {{
+                            task.assigne.prenom }}</a><br>
+                        <strong>Demandé par :</strong> <a class="btn "
+                            href="{{ path('user_profile', {id: task.createur.id}) }}">{{ task.createur.nom }} {{
+                            task.createur.prenom }}</a><br>
+                        <strong>Projet associé:</strong> <a class="btn "
+                            href="{{ path('project_kanban', {id: task.project.id}) }}">{{ task.project.titre }} </a>
+                    </p>
+                    <a href="{{ path('app_task_show', {id: task.id}) }}" class="btn btn-primary">Détails</a>
+                </div>
+            </div>
+
+            {% endfor %}
+        </div>
+        <a href="{{ path('app_task_new') }}" class="btn m-3 border-primary">Nouvelle tâche</a>
+        <div class="pagination mt-5" style="display: flex; justify-content: center;">
+            <nav aria-label="Page navigation">
+                <ul class="pagination    ">
+                    {% if current_page > 1 %}
+
+                    <li class="page-item">
+                        <a class="page-link" href="{{ path('app_task_index', {'page': current_page - 1}) }}"
+                            aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% if current_page > 2 %}
+
+                    <li class="page-item">
+                        <a class="page-link" href="{{ path('app_task_index', {'page': current_page - 2}) }}"
+                            aria-label="Previous">
+                            <span aria-hidden="true">{{ current_page - 2 }}</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% if current_page > 1 %}
+
+                    <li class="page-item">
+                        <a class="page-link" href="{{ path('app_task_index', {'page': current_page - 1}) }}"
+                            aria-label="Previous">
+                            <span aria-hidden="true">{{ current_page - 1 }}</span>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <li class="page-item active" aria-current="page">
+                        <a class="page-link" href="{{ path('app_task_index', {'page': current_page }) }}">{{ current_page }}</a>
+                    </li>
+
+                    {% if current_page < total_pages %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ path('app_task_index', {'page': current_page + 1}) }}"
+                            aria-label="Previous">
+                            <span aria-hidden="true">{{ current_page + 1 }}</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% if current_page+2 < total_pages %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ path('app_task_index', {'page': current_page + 2}) }}"
+                            aria-label="Previous">
+                            <span aria-hidden="true">{{ current_page + 2 }}</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% if current_page < total_pages %} <li class="page-item">
+                        <a class="page-link" href="{{ path('app_task_index', {'page': current_page + 1}) }}"
+                            aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                        </li>
+                        {% endif %}
+
+                </ul>
+            </nav>
+            {# {% if current_page > 1 %}
+            <a href="{{ path('app_task_index', {'page': current_page - 1}) }}">Précédent</a>
+            {% endif %}
+
+            {% for i in 1..total_pages %}
+            <a href="{{ path('app_task_index', {'page': i}) }}" {% if i==current_page %}class="active" {% endif %}>{{ i
+                }}</a>
+            {% endfor %}
+
+            {% if current_page < total_pages %} <a href="{{ path('app_task_index', {'page': current_page + 1}) }}">
+                Suivant</a>
+                {% endif %} #}
+        </div>
+
+
+        {#
     </tbody>
-</table>
-<a href="{{ path('app_task_new') }}">Create New Task</a>
+</table> #}
+
 {% endblock %}

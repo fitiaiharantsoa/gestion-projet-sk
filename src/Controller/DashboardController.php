@@ -69,6 +69,8 @@ class DashboardController extends AbstractController
                 'nbr_tache'=>count($tache),
             ]);
         }
+        return $this->render('dashboard/index.html.twig', [
+            'user' => $user]);
     }
 
     #[Route('/switch-theme', name: 'app_switch_theme')]

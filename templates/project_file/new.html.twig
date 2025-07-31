@@ -3,9 +3,9 @@
 {% block title %}Ajouter un fichier projet{% endblock %}
 
 {% block body %}
-    <h1>Ajouter un fichier</h1>
+    <h1>Ajouter un nouveau fichier</h1>
 
     {{ include('projet_file/_form.html.twig', {'form': form}) }}
 
-    <a href="{{ path('app_projet_file_index') }}">Retour à la liste</a>
+    <a href="{{ path('app_project_file_index') }}">Retour</a>
 {% endblock %}

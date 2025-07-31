@@ -7,7 +7,7 @@ use App\Form\ProjectFileType;
 use App\Repository\ProjectFileRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -25,38 +25,33 @@ final class ProjectFileController extends AbstractController
     }
 
     #[Route('/new', name: 'app_project_file_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger, #[Autowire('%kernel.project_dir%/public/uploads/file')]string $projectDir): Response
     {
         $projectFile = new ProjectFile();
         $form = $this->createForm(ProjectFileType::class, $projectFile);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Gestion du fichier uploadé
-            $uploadedFile = $form->get('fichier')->getData();
-
-            if ($uploadedFile) {
-                $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
-                // Nettoyage du nom de fichier pour éviter les caractères problématiques
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename.'-'.uniqid().'.'.$uploadedFile->guessExtension();
-
-                // Déplacement du fichier dans le dossier "public/uploads/project_files"
-                try {
-                    $uploadedFile->move(
-                        $this->getParameter('project_files_directory'), // définir ce paramètre dans config/services.yaml
-                        $newFilename
-                    );
-                } catch (FileException $e) {
-                    $this->addFlash('error', 'Erreur lors du téléchargement du fichier.');
-                    // Tu peux logger ou gérer autrement l'exception
+            $uploadFile = $form->get('project_file')->getData();
+            if ($uploadFile) {
+                if ($uploadFile){
+                    $originalName = pathinfo($uploadFile->getClientOriginalName(), PATHINFO_FILENAME);
+                    $safeFilename = $slugger->slug($originalName);
+                    $newFilename = $safeFilename.'-'.uniqid().'.'.$uploadFile->guessExtension();
+    
+                    try {
+                        $uploadFile->move(
+                            $projectDir,
+                            $newFilename
+                        );
+                    } catch (\Throwable $th) {
+                        throw $th;
+                    }
+                    $projectFile->setFilepath($newFilename);
+                    $projectFile->setDateUpload(new \DateTimeImmutable('now'));
                 }
-
-                // Mise à jour de l'entité avec le nom du fichier (url)
-                $projectFile->setUrl($newFilename);
             }
 
-            // Persist et flush
             $entityManager->persist($projectFile);
             $entityManager->flush();
 
@@ -94,16 +89,7 @@ final class ProjectFileController extends AbstractController
                 $safeFilename = $slugger->slug($originalFilename);
                 $newFilename = $safeFilename.'-'.uniqid().'.'.$dateUploadFile->guessExtension();
 
-                try {
-                    $dateUploadFile->move(
-                        $this->getParameter('project_files_directory'),
-                        $newFilename
-                    );
-                } catch (FileException $e) {
-                    $this->addFlash('error', 'Erreur lors du téléchargement du fichier.');
-                }
-
-                $projectFile->setUrl($newFilename);
+                
             }
 
             $entityManager->flush();
@@ -120,9 +106,12 @@ final class ProjectFileController extends AbstractController
     }
 
     #[Route('/delete/{id}', name: 'app_project_file_delete', methods: ['POST'], requirements: ['id' => '\d+'])]
-    public function delete(Request $request, ProjectFile $projectFile, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, ProjectFile $projectFile, EntityManagerInterface $entityManager, #[Autowire('%kernel.project_dir%/public/uploads/file')]string $projectDir): Response
     {
         if ($this->isCsrfTokenValid('delete'.$projectFile->getId(), $request->request->get('_token'))) {
+            if (file_exists($projectDir.'/'.$projectFile->getFilepath())) {
+                unlink($projectDir.'/'.$projectFile->getFilepath());
+            }
             $entityManager->remove($projectFile);
             $entityManager->flush();
             $this->addFlash('success', 'Fichier supprimé avec succès.');
@@ -132,18 +121,4 @@ final class ProjectFileController extends AbstractController
     }
 // Dans votre ProjectFileController, ajoutez cette méthode :
 
-#[Route('/project-file/download/{id}', name: 'app_project_file_download')]
-public function download(ProjectFile $projectFile): Response
-{
-    $filePath = $this->getParameter('uploads_directory') . '/' . $projectFile->getUrl();
-    
-    if (!file_exists($filePath)) {
-        throw $this->createNotFoundException('Fichier non trouvé.');
-    }
-    
-    // Essayer de deviner le nom original à partir du nom de fichier
-    $originalName = $projectFile->getUrl();
-    
-    return $this->file($filePath, $originalName);
-}
 }
