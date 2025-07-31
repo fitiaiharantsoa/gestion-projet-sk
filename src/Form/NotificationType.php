@@ -15,13 +15,6 @@ class NotificationType extends AbstractType
     {
         $builder
             ->add('message')
-            ->add('seen')
-            ->add('createdAt')
-            ->add('createdBy', EntityType::class, [
-                'class' => User::class,
-                'choice_label' => 'id',
-                'label' => 'Créé par',
-            ])
             ->add('recipient', EntityType::class, [
                 'class' => User::class,
                 'choice_label' => 'email',

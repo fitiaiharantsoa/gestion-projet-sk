@@ -233,9 +233,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     }
 
     public function isEmailAuthEnabled(): bool
-    {
-        return $this->isEmailAuthEnabled;
-    }
+{
+    return $this->isVerified && $this->isEmailAuthEnabled;
+}
+
 
     public function setIsEmailAuthEnabled(bool $isEnabled): static
     {

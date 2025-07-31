@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Upload fichier projet{% endblock %}
+
+{% block body %}
+<h1>Upload fichier pour projet</h1>
+
+<select id="project-select">
+    <option value="">-- Choisir un projet --</option>
+    {% for project in projects %}
+        <option value="{{ project.id }}">{{ project.titre }}</option>
+    {% endfor %}
+</select>
+
+<input type="file" id="file-input" name="fichier" accept=".jpg,.jpeg,.png,.gif,.pdf,.txt" required>
+
+<button id="upload-btn">Envoyer</button>
+
+<div id="result"></div>
+
+<script>
+document.getElementById('upload-btn').addEventListener('click', () => {
+    const fileInput = document.getElementById('file-input');
+    const projectSelect = document.getElementById('project-select');
+    const resultDiv = document.getElementById('result');
+
+    if (!projectSelect.value) {
+        resultDiv.innerHTML = '<p style="color:red;">Veuillez sélectionner un projet.</p>';
+        return;
+    }
+
+    if (fileInput.files.length === 0) {
+        resultDiv.innerHTML = '<p style="color:red;">Veuillez sélectionner un fichier.</p>';
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('fichier', fileInput.files[0]);
+    formData.append('project_id', projectSelect.value);
+
+    resultDiv.innerHTML = '<p style="color:blue;">Upload en cours...</p>';
+
+    fetch('{{ path("app_upload_ajax") }}', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erreur HTTP: ' + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            resultDiv.innerHTML = `<p style="color:green;">${data.message}</p>`;
+            fileInput.value = '';
+            projectSelect.value = '';
+        } else {
+            resultDiv.innerHTML = `<p style="color:red;">Erreur: ${data.message}</p>`;
+        }
+    })
+    .catch(error => {
+        resultDiv.innerHTML = `<p style="color:red;">Erreur: ${error.message}</p>`;
+    });
+});
+</script>
+{% endblock %}

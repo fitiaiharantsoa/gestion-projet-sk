@@ -18,7 +18,7 @@ final class NotificationController extends AbstractController
     public function index(NotificationRepository $notificationRepository): Response
     {
         return $this->render('notification/index.html.twig', [
-            'notifications' => $notificationRepository->findAll(),
+            'notifications' => $notificationRepository->findBy(["recipient"=> $this->getUser()]),
         ]);
     }
 
@@ -61,8 +61,10 @@ final class NotificationController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_notification_show', methods: ['GET'])]
-    public function show(Notification $notification): Response
+    public function show(Notification $notification , EntityManagerInterface $entityManager ): Response
     {
+        $notification->setSeen(true); // Marquer la notification comme lue
+        $entityManager->flush();
         return $this->render('notification/show.html.twig', [
             'notification' => $notification,
         ]);

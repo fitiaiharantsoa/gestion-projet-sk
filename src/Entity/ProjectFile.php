@@ -13,26 +13,29 @@ class ProjectFile
     #[ORM\Column]
     private ?int $id = null;
 
-    // Relation correcte avec l'entité Project
+    // Relation avec l'entité Project - NULLABLE pour permettre upload sans projet
     #[ORM\ManyToOne(inversedBy: 'projectFiles')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]  // Changé de false à true
     private ?Project $project = null;
 
-    #[ORM\Column(length: 50)]
+    // Type MIME du fichier
+    #[ORM\Column(length: 100)]
     private ?string $type = null;
 
+    // Date d'upload (gardons celui-ci)
     #[ORM\Column]
     private ?\DateTimeImmutable $dateUpload = null;
 
-    // Stocke l'URL ou le nom du fichier
+    // Nom du fichier stocké sur le serveur
     #[ORM\Column(length: 255)]
     private ?string $url = null;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    // Nom original du fichier
+    #[ORM\Column(length: 255)]
     private ?string $filename = null;
 
-    #[ORM\Column(type: 'datetime_immutable')]
-    private ?\DateTimeImmutable $uploadedAt = null;
+    // SUPPRIMÉ: uploadedAt car redondant avec dateUpload
+    // Si vous voulez le garder, supprimez dateUpload à la place
 
     public function getId(): ?int
     {
@@ -91,17 +94,6 @@ class ProjectFile
     public function setFilename(string $filename): static
     {
         $this->filename = $filename;
-        return $this;
-    }
-
-    public function getUploadedAt(): ?\DateTimeImmutable
-    {
-        return $this->uploadedAt;
-    }
-
-    public function setUploadedAt(\DateTimeImmutable $uploadedAt): static
-    {
-        $this->uploadedAt = $uploadedAt;
         return $this;
     }
 }
