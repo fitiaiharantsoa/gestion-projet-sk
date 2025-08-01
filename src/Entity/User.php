@@ -49,8 +49,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $prenom = null;
 
-
-
     /**
      * @var Collection<int, ProjectLog>
      */
@@ -112,7 +110,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         return $this;
     }
 
-  
 
     public function getUserIdentifier(): string
     {

@@ -89,16 +89,7 @@ final class ProjectFileController extends AbstractController
                 $safeFilename = $slugger->slug($originalFilename);
                 $newFilename = $safeFilename.'-'.uniqid().'.'.$dateUploadFile->guessExtension();
 
-                try {
-                    $dateUploadFile->move(
-                        $this->getParameter('project_files_directory'),
-                        $newFilename
-                    );
-                } catch (FileException $e) {
-                    $this->addFlash('error', 'Erreur lors du téléchargement du fichier.');
-                }
-
-                $projectFile->setUrl($newFilename);
+                
             }
 
             $entityManager->flush();
@@ -129,20 +120,5 @@ final class ProjectFileController extends AbstractController
         return $this->redirectToRoute('app_project_file_index', [], Response::HTTP_SEE_OTHER);
     }
 // Dans votre ProjectFileController, ajoutez cette méthode :
-/*
-#[Route('/project-file/download/{id}', name: 'app_project_file_download')]
-public function download(ProjectFile $projectFile): Response
-{
-    $filePath = $this->getParameter('uploads_directory') . '/' . $projectFile->getUrl();
-    
-    if (!file_exists($filePath)) {
-        throw $this->createNotFoundException('Fichier non trouvé.');
-    }
-    
-    // Essayer de deviner le nom original à partir du nom de fichier
-    $originalName = $projectFile->getUrl();
-    
-    return $this->file($filePath, $originalName);
-}
-}*/
+
 }
