@@ -19,15 +19,10 @@ class ProjectFileType extends AbstractType
     {
         $builder
             ->add('filename', null, [
-                'label'=>'Nom de fichier',
-                'attr' => ['placeholder' => 'Entrez le nom du fichier'],
-            ])
-
-            // Champ d’import de fichier depuis l’ordinateur
-            ->add('fichier', FileType::class, [
-                'label' => 'Fichier à importer',
-                'mapped' => false, // Ne mappe pas directement à l'entité
-                'required' => true,
+                'label' => 'Nom de fichier',
+                'attr' => ['placeholder' => 'Entrez le nom du fichier', 'class' => 'form-control'],
+                'label_attr' => ['class' => 'form-label'],
+                'row_attr' => ['class' => 'mb-3']
             ])
 
             // Champ de sélection du projet associé
@@ -36,18 +31,24 @@ class ProjectFileType extends AbstractType
                 'choice_label' => 'titre',
                 'label' => 'Projet associé',
                 'placeholder' => 'Choisissez un projet',
+                'attr' => ['class' => 'form-select'],
+                'label_attr' => ['class' => 'form-label'],
+                'row_attr' => ['class' => 'mb-3']
             ])
-            ->add('project_file', FileType::class, [
-                'label'=>'Upload de fichier',
+            ->add('filepath', FileType::class, [
+                'label' => 'Fichier à importer',
+                'attr' => ['class' => 'form-control'],
+                'label_attr' => ['class' => 'form-label'],
                 'required' => true,
-                'mapped'=>false,
-                'constraints'=>[
+                'mapped' => false,
+                'constraints' => [
                     new File(
                         maxSize: '10240k',
-                        extensions:["pdf", 'doc', 'docx', 'txt', 'csv', 'xlsx'],
-                        extensionsMessage:'Le fichier n\'est pas valide'
+                        extensions: ["pdf", 'doc', 'docx', 'txt', 'csv', 'xlsx'],
+                        extensionsMessage: 'Le fichier n\'est pas valide'
                     )
-                ]
+                ],
+                'row_attr' => ['class' => 'mb-3']
             ]);
     }
 

@@ -69,6 +69,51 @@ class DashboardController extends AbstractController
                 'nbr_tache'=>count($tache),
             ]);
         }
+        if (in_array('ROLE_BU', $user->getRoles())){
+            $bu = $this->getUser()->getBus();
+            $id_bu = [];
+            foreach ($bu as $b) {
+                $id_bu[] = $b->getId();
+            }
+            $departement = $departementRepository->findBy(['bu' => $id_bu]);
+            $id_dep = [];
+            foreach ($departement as $key => $value) {
+                $id_dep[] = $value->getId();
+            }
+
+            $projet = $projectRepository->findBy(['departement' => $id_dep], ['id' => 'DESC']);
+            $projet_en_cours = $projectRepository->findBy(['departement' => $id_dep, 'statut'=> 'en cours'], ['id' => 'DESC']);
+            $projet_termine = $projectRepository->findBy(['departement' => $id_dep, 'statut'=> 'terminé'], ['id' => 'DESC']);
+            $projet_a_faire = $projectRepository->findBy(['departement' => $id_dep, 'statut'=> 'à faire'], ['id' => 'DESC']);
+            $projet_bloque = $projectRepository->findBy(['departement' => $id_dep, 'statut'=> 'bloqué'], ['id' => 'DESC']);
+
+
+            $membres = $userRepository->findBy(['departement'=> $id_dep], ['id'=> 'DESC']);
+            $id_pro = [];
+            foreach ($projet as $key => $value) {
+                $id_pro[] = $value->getId();
+            }
+            $task = $taskRepository->findBy(['project'=> $id_pro], ['id' => 'DESC']);
+            $task_en_cours = $taskRepository->findBy(['project'=> $id_pro, 'statut'=>'en cours'], ['id' => 'DESC']);
+            $task_a_faire = $taskRepository->findBy(['project'=> $id_pro, 'statut'=>'à faire'], ['id' => 'DESC']);
+            $task_termine = $taskRepository->findBy(['project'=> $id_pro, 'statut'=>'terminé'], ['id' => 'DESC']);
+            $task_bloque = $taskRepository->findBy(['project'=> $id_pro, 'statut'=>'bloqué'], ['id' => 'DESC']);
+            return $this->render('dashboard/index.html.twig', [
+                'user' => $user,
+                'projet' => $projet,
+                'departement'=>$departement,
+                'task'=>$task,
+                'membres'=>$membres,
+                'projet_en_cours'=>$projet_en_cours,
+                'projet_termine'=>$projet_termine,
+                'projet_a_faire'=>$projet_a_faire,
+                'projet_bloque'=>$projet_bloque,
+                'task_en_cours'=>$task_en_cours,
+                'task_a_faire'=>$task_a_faire,
+                'task_termine'=>$task_termine,
+                'task_bloque'=>$task_bloque,
+            ]);
+        }
         return $this->render('dashboard/index.html.twig', [
             'user' => $user]);
     }

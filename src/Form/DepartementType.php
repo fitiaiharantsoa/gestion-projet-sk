@@ -2,6 +2,8 @@
 
 namespace App\Form;
 
+use App\Controller\BUController;
+use App\Entity\BU;
 use App\Entity\Departement;
 use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -30,6 +32,11 @@ class DepartementType extends AbstractType
                 'choice_label' => function (User $user) {
                     return $user->getPrenom() . ' ' . $user->getNom() .' '. $this->AfficherRole($user->getRoles());
                 },
+            ])
+            ->add('bu', EntityType::class, [
+                'label'=>'BU du département',
+                'choice_label' => 'nom',
+                'class' => BU::class,
             ])
         ;
     }

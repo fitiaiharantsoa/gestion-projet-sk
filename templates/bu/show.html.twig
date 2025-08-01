@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}BU{% endblock %}
+
+{% block body %}
+<h1>BU</h1>
+
+<table class="table">
+    <tbody>
+        <tr>
+            <th>Id</th>
+            <td>{{ b_u.id }}</td>
+        </tr>
+        <tr>
+            <th>Nom</th>
+            <td>{{ b_u.nom }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3>Départements</h3>
+<ul>
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <th>Nom</th>
+                <th>Action</th>
+            </tr>
+            {% for department in departements %}
+            {# <li>
+                <a href="{{ path('app_departement_show', {'id': department.id}) }}">{{ department.nom }}</a>
+            </li> #}
+            <tr>
+                <td>{{department.id}}</td>
+                <td>{{department.nom}}</td>
+                <td><a href="{{ path('app_departement_show', {'id': department.id}) }}">Voir</a></td>
+            </tr>
+            {% else %}
+            <tr>
+                <td>Aucun département</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {# {% for department in departements %}
+    <li>
+        <a href="{{ path('app_departement_show', {'id': department.id}) }}">{{ department.nom }}</a>
+    </li>
+
+    {% else %}
+    <li>No departments found</li>
+    {% endfor %} #}
+    <a href="{{ path('app_b_u_index') }}">back to list</a>
+
+    {% if 'ROLE_PDG' in app.user.roles %}
+    <a href="{{ path('app_b_u_edit', {'id': b_u.id}) }}">edit</a>
+
+    {{ include('bu/_delete_form.html.twig') }}
+    {% endif %}
+    
+    {% endblock %}

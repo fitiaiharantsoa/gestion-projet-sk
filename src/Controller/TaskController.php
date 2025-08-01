@@ -27,8 +27,21 @@ final class TaskController extends AbstractController
     public function index(TaskRepository $taskRepository, Request $request): Response
     {
         $page = $request->query->getInt('page', 1);
-        $limit = 9;
+        $limit = 10;
 
+        if (in_array('ROLE_BU', $this->getUser()->getRoles())) {
+            $task = $taskRepository->findBy(['createur'=>$this->getUser()->getId()], ['id'=>'DESC'], $limit, ($page - 1) * $limit);
+            $totalTasks = $taskRepository->count(['createur' => $this->getUser()->getId()]);
+            $totalPages = ceil($totalTasks/$limit);
+
+            return $this->render('task/index.html.twig', [
+                'tasks' => $task,
+                'current_page'=>$page,
+                'total_pages' => $totalPages,
+                'total_task'=>$totalTasks
+            ]);
+        }
+        
         $task = $taskRepository->findPaginatedTask($page, $limit);
         $totalTasks = $taskRepository->countAllTask();
         $totalPages = ceil($totalTasks / $limit);

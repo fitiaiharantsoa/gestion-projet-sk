@@ -10,5 +10,10 @@
         {{ form_label(form.chef) }}
         {{ form_errors(form.chef) }}
     </div>
+    <div class="form-floating mb-3">
+        {{ form_widget(form.bu, {'attr': {'class': 'form-select'}}) }}
+        {{ form_label(form.bu) }}
+        {{ form_errors(form.bu) }}
+    </div>
     <button class="btn btn-outline-primary">{{ button_label|default('Enregistrer') }}</button>
 {{ form_end(form) }}

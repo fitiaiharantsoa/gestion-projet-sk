@@ -25,8 +25,8 @@ class Project
     #[ORM\Column(type: Types::TEXT)]
     private ?string $description = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $bu = null;
+    // #[ORM\Column(length: 255)]
+    // private ?string $bu = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $dateDebut = null;
@@ -89,16 +89,16 @@ class Project
         return $this;
     }
 
-    public function getBu(): ?string
-    {
-        return $this->bu;
-    }
+    // public function getBu(): ?string
+    // {
+    //     return $this->bu;
+    // }
 
-    public function setBu(string $bu): static
-    {
-        $this->bu = $bu;
-        return $this;
-    }
+    // public function setBu(string $bu): static
+    // {
+    //     $this->bu = $bu;
+    //     return $this;
+    // }
 
     public function getDateDebut(): ?\DateTimeInterface
     {
