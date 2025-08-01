@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Task{% endblock %}
+{% block title %}Tâche{% endblock %}
 
 {% block body %}
-    <h1>Task</h1>
+    <h1>Tâche</h1>
 
     <table class="table">
         <tbody>
@@ -24,29 +24,29 @@
                 <td>{{ task.statut }}</td>
             </tr>
             <tr>
-                <th>DateEcheance</th>
+                <th>Date Echéance</th>
                 <td>{{ task.dateEcheance ? task.dateEcheance|date('Y-m-d') : '' }}</td>
             </tr>
             <tr>
-                <th>Priorite</th>
+                <th>Priorité</th>
                 <td>{{ task.priorite }}</td>
             </tr>
             <tr>
-                <th>Progression</th>
+                <th>Progréssion</th>
                 <td>{{ task.progression }}</td>
             </tr>
             <tr>
-                <th>CreatedAt</th>
+                <th>Date de création</th>
                 <td>{{ task.createdAt ? task.createdAt|date('Y-m-d H:i:s') : '' }}</td>
             </tr>
             <tr>
-                <th>UpdatedAt</th>
+                <th>Dèrnière Modification</th>
                 <td>{{ task.updatedAt ? task.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
             </tr>
         </tbody>
     </table>
 
-    <a href="{{ path('app_task_index') }}">back to list</a>
+    <a href="{{ path('app_task_index') }}">Retour</a>
 
     <a href="{{ path('app_task_edit', {'id': task.id}) }}">edit</a>
 

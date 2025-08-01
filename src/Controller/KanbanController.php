@@ -37,14 +37,26 @@ class KanbanController extends AbstractController
      * Afficher la vue Kanban d'un projet
      */
     #[Route('/project/{id}/kanban', name: 'project_kanban')]
-    public function kanban(int $id): Response
+    public function index(int $id): Response
     {
         $project = $this->projectRepository->find($id);
         if (!$project) {
             throw $this->createNotFoundException('Projet non trouvé');
         }
 
-        $tasks = $this->taskRepository->findBy(['project' => $project]);
+        $currentUser = $this->getUser();
+        
+        // Déterminer les tâches visibles selon le rôle de l'utilisateur
+        if ($this->isGranted('ROLE_PDG') || $this->isGranted('ROLE_CHEF_DEPARTEMENT')) {
+            // PDG et Chef de département voient TOUTES les tâches du projet
+            $tasks = $this->taskRepository->findBy(['project' => $project]);
+        } else {
+            // Collaborateur normal voit SEULEMENT ses propres tâches
+            $tasks = $this->taskRepository->findBy([
+                'project' => $project,
+                'assigne' => $currentUser
+            ]);
+        }
 
         // Organiser les tâches par statut (les clés correspondent aux valeurs exactes en base)
         $tasksByStatus = [
@@ -73,8 +85,13 @@ class KanbanController extends AbstractController
      * Ajouter une nouvelle tâche via formulaire POST (dans modal)
      */
     #[Route('/project/{id}/kanban/add-task', name: 'kanban_add_task', methods: ['POST'])]
-    public function addTask(Request $request, int $id ): Response
+    public function addTask(Request $request, int $id): Response
     {
+        // Seuls PDG et Chef de département peuvent créer des tâches
+        if (!$this->isGranted('ROLE_PDG') && !$this->isGranted('ROLE_CHEF_DEPARTEMENT')) {
+            throw $this->createAccessDeniedException('Seuls le PDG et les chefs de département peuvent créer des tâches.');
+        }
+
         $project = $this->projectRepository->find($id);
         if (!$project) {
             throw $this->createNotFoundException('Projet non trouvé');
@@ -93,7 +110,7 @@ class KanbanController extends AbstractController
         $task->setDateEcheance($dueDate ? new \DateTime($dueDate) : null);
         $task->setStatut('à faire'); // statut par défaut
         $task->setProject($project);
-        $user= $this->userRepository->find($assigne);
+        $user = $this->userRepository->find($assigne);
         $task->setAssigne($user);
         $currentDate = new \DateTime('now');   
         $dateTimeImmutable = DateTimeImmutable::createFromMutable($currentDate);
@@ -103,54 +120,5 @@ class KanbanController extends AbstractController
         $this->entityManager->flush();
 
         return $this->redirectToRoute('project_kanban', ['id' => $id]);
-    }
-
-    /**
-     * Mettre à jour le statut d'une tâche via AJAX (drag & drop)
-     */
-    #[Route('/task/{id}/update-status', name: 'task_update_status', methods: ['POST'])]
-    public function updateTaskStatus(int $id, Request $request): Response
-    {
-        $task = $this->taskRepository->find($id);
-        if (!$task) {
-            return $this->json(['error' => 'Tâche non trouvée'], 404);
-        }
-
-        $data = json_decode($request->getContent(), true);
-        $newStatus = $data['status'] ?? null;
-
-        $allowedStatuses = ['à faire', 'en cours', 'bloquée', 'terminée'];
-        if (!in_array($newStatus, $allowedStatuses, true)) {
-            return $this->json(['error' => 'Statut invalide'], 400);
-        }
-
-        $task->setStatut($newStatus);
-
-        // Mise à jour automatique de la progression selon statut
-        switch ($newStatus) {
-            case 'à faire':
-                $task->setProgression(0);
-                break;
-            case 'en cours':
-                if ($task->getProgression() === null || $task->getProgression() === 0) {
-                    $task->setProgression(25);
-                }
-                break;
-            case 'terminée':
-                $task->setProgression(100);
-                break;
-            // 'bloquée' garde sa progression actuelle
-        }
-
-        $this->entityManager->flush();
-
-        return $this->json([
-            'success' => true,
-            'task' => [
-                'id' => $task->getId(),
-                'statut' => $task->getStatut(),
-                'progression' => $task->getProgression(),
-            ],
-        ]);
     }
 }

@@ -1,21 +1,30 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Détail du fichier{% endblock %}
+{% block title %}Fichier de projet{% endblock %}
 
 {% block body %}
-    <h1>Détail du fichier projet</h1>
+    <h1>Fichier de Projet</h1>
 
-    <ul>
-        <li><strong>Type :</strong> {{ project_file.type }}</li>
-        <li><strong>Date :</strong> {{ project_file.dateUpload ? project_file.dateUpload|date('d/m/Y') : '' }}</li>
-        <li><strong>Project :</strong> {{ project_file.project.titre }}</li>
-    </ul>
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ project_file.id }}</td>
+            </tr>
+            <tr>
+                <th>Type</th>
+                <td>{{ project_file.type }}</td>
+            </tr>
+            <tr>
+                <th>Date d'upload</th>
+                <td>{{ project_file.dateUpload ? project_file.dateUpload|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
 
-    <a href="{{ path('app_project_file_edit', {'id': project_file.id}) }}" class="btn btn-warning">Modifier</a>
-    <form method="post" action="{{ path('app_project_file_delete', {'id': project_file.id}) }}" style="display:inline;" onsubmit="return confirm('Confirmer la suppression ?');">
-        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ project_file.id) }}">
-        <button class="btn btn-danger">Supprimer</button>
-    </form>
+    <a href="{{ path('app_project_file_index') }}">retour</a>
 
-    <a href="{{ path('app_project_file_index') }}" class="btn btn-secondary">Retour à la liste</a>
+    <a href="{{ path('app_project_file_edit', {'id': project_file.id}) }}">Modifier</a>
+
+    {{ include('project_file/_delete_form.html.twig') }}
 {% endblock %}

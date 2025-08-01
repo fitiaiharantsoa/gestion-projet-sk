@@ -18,24 +18,17 @@ class ProjectFile
     #[ORM\JoinColumn(nullable: true)]  // Changé de false à true
     private ?Project $project = null;
 
-    // Type MIME du fichier
-    #[ORM\Column(length: 100)]
-    private ?string $type = null;
+   
 
     // Date d'upload (gardons celui-ci)
     #[ORM\Column]
     private ?\DateTimeImmutable $dateUpload = null;
 
-    // Nom du fichier stocké sur le serveur
-    #[ORM\Column(length: 255)]
-    private ?string $url = null;
-
-    // Nom original du fichier
     #[ORM\Column(length: 255)]
     private ?string $filename = null;
 
-    // SUPPRIMÉ: uploadedAt car redondant avec dateUpload
-    // Si vous voulez le garder, supprimez dateUpload à la place
+    #[ORM\Column(length: 255)]
+    private ?string $filepath = null;
 
     public function getId(): ?int
     {
@@ -53,17 +46,6 @@ class ProjectFile
         return $this;
     }
 
-    public function getType(): ?string
-    {
-        return $this->type;
-    }
-
-    public function setType(string $type): static
-    {
-        $this->type = $type;
-        return $this;
-    }
-
     public function getDateUpload(): ?\DateTimeImmutable
     {
         return $this->dateUpload;
@@ -75,17 +57,6 @@ class ProjectFile
         return $this;
     }
 
-    public function getUrl(): ?string
-    {
-        return $this->url;
-    }
-
-    public function setUrl(string $url): static
-    {
-        $this->url = $url;
-        return $this;
-    }
-
     public function getFilename(): ?string
     {
         return $this->filename;
@@ -94,6 +65,19 @@ class ProjectFile
     public function setFilename(string $filename): static
     {
         $this->filename = $filename;
+
+        return $this;
+    }
+
+    public function getFilepath(): ?string
+    {
+        return $this->filepath;
+    }
+
+    public function setFilepath(string $filepath): static
+    {
+        $this->filepath = $filepath;
+
         return $this;
     }
 }

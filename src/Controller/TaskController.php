@@ -24,25 +24,43 @@ final class TaskController extends AbstractController
     }
 
     #[Route('', name: 'app_task_index', methods: ['GET'])]
-    public function index(TaskRepository $taskRepository): Response
+    public function index(TaskRepository $taskRepository, Request $request): Response
     {
+        $page = $request->query->getInt('page', 1);
+        $limit = 9;
+
+        $task = $taskRepository->findPaginatedTask($page, $limit);
+        $totalTasks = $taskRepository->countAllTask();
+        $totalPages = ceil($totalTasks / $limit);
+        $currentPage = $page;
+
+
         return $this->render('task/index.html.twig', [
-            'tasks' => $taskRepository->findAll(),
+            'tasks' => $task,
+            'current_page'=>$currentPage,
+            'total_pages' => $totalPages,
+            'total_task'=>$totalTasks
         ]);
     }
 
     #[Route('/my-tasks', name: 'app_task_list', methods: ['GET'])]
-    public function myTasks(TaskRepository $taskRepository): Response
+    public function myTasks(TaskRepository $taskRepository, Request $request): Response
     {
         $user = $this->getUser();
+        $page = $request->query->getInt('page', 1);
+        $limit = 10;
+        $offset = ($page - 1) * $limit;
         if (!$user) {
             throw $this->createAccessDeniedException('Vous devez être connecté pour voir vos tâches.');
         }
-
-        $tasks = $taskRepository->findBy(['assigne' => $user]);
+        
+        $tasks = $taskRepository->findBy(['assigne' => $user], ['id'=>"desc"], $limit, $offset);
 
         return $this->render('task/my_tasks.html.twig', [
             'tasks' => $tasks,
+            'task_total'=> count($tasks),
+            'current_page' => $page,
+            'total_pages' => ceil(count($tasks) / $limit),
         ]);
     }
 
@@ -54,6 +72,9 @@ final class TaskController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $user = $this->getUser();
+            $task->setCreateur($user);
+            $task->setCreatedAt(new \DateTimeImmutable('now'));
             $entityManager->persist($task);
             $entityManager->flush();
 
@@ -119,8 +140,6 @@ final class TaskController extends AbstractController
         return $this->redirectToRoute('app_task_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    // Les autres méthodes (startTask, finishTask, updateStatus) restent identiques, tu peux y ajouter des logs si besoin
-
     #[Route('/{id}/start', name: 'app_task_start', methods: ['GET'])]
     public function startTask(Task $task, EntityManagerInterface $em): Response
     {
@@ -158,6 +177,9 @@ final class TaskController extends AbstractController
         return $this->redirectToRoute('app_task_list');
     }
 
+    /**
+     * MÉTHODE MODIFIÉE : Ajout des permissions et gestion de la progression
+     */
     #[Route('/{id}/update-status', name: 'app_task_update_status', methods: ['POST'])]
     public function updateStatus(int $id, Request $request, EntityManagerInterface $em): JsonResponse
     {
@@ -165,6 +187,23 @@ final class TaskController extends AbstractController
 
         if (!$task) {
             return $this->json(['error' => 'Tâche non trouvée'], 404);
+        }
+
+        $currentUser = $this->getUser();
+        
+        // AJOUT : Vérification des permissions
+        $canModify = false;
+        
+        if ($this->isGranted('ROLE_PDG') || $this->isGranted('ROLE_CHEF_DEPARTEMENT')) {
+            // PDG et Chef de département peuvent modifier toutes les tâches
+            $canModify = true;
+        } elseif ($task->getAssigne() === $currentUser) {
+            // Collaborateur peut modifier seulement ses propres tâches
+            $canModify = true;
+        }
+
+        if (!$canModify) {
+            return $this->json(['error' => 'Vous ne pouvez modifier que vos propres tâches'], 403);
         }
 
         $data = json_decode($request->getContent(), true);
@@ -180,14 +219,38 @@ final class TaskController extends AbstractController
         }
 
         $task->setStatut($newStatus);
+
+        // AJOUT : Mise à jour automatique de la progression selon le statut
+        switch ($newStatus) {
+            case 'à faire':
+                $task->setProgression(0);
+                break;
+            case 'en cours':
+                if ($task->getProgression() === null || $task->getProgression() === 0) {
+                    $task->setProgression(25);
+                }
+                break;
+            case 'terminée':
+                $task->setProgression(100);
+                break;
+            // 'bloquée' garde sa progression actuelle
+        }
+
         $em->flush();
 
         if ($task->getProject()) {
-            $user = $this->getUser();
-            $userName = $user ? $user->getUserIdentifier() : 'Utilisateur inconnu';
+            $userName = $currentUser ? $currentUser->getUserIdentifier() : 'Utilisateur inconnu';
             $this->projectLogService->log($task->getProject(), "Mise à jour du statut de la tâche '{$task->getTitre()}' à '{$newStatus}' par {$userName}");
         }
 
-        return $this->json(['success' => true]);
+        // AJOUT : Retourner les données de la tâche mise à jour pour le JavaScript
+        return $this->json([
+            'success' => true,
+            'task' => [
+                'id' => $task->getId(),
+                'statut' => $task->getStatut(),
+                'progression' => $task->getProgression(),
+            ],
+        ]);
     }
 }

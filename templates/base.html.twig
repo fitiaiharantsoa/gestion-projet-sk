@@ -103,17 +103,37 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                {% if is_granted('ROLE_BU') %}
-                    <li class="nav-item"><a class="nav-link" href="{{ path('app_project_index') }}">Projets</a></li>
-                {% endif %}
-                <li class="nav-item"><a class="nav-link" href="{{ path('app_task_index') }}">Tâches</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ path('app_project_file_index') }}">Fichiers</a></li>
-                {# <li class="nav-item"><a class="nav-link" href="{{ path('app_task_comment_index') }}">Commentaires</a></li> #}
-                <li class="nav-item"><a class="nav-link" href="{{ path('app_project_log_index') }}">Journaux</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ path('app_notification_index') }}">Notifications</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ path('app_departement_index') }}">Départements</a></li>
-            </ul>
+           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+    {% if is_granted('ROLE_USER') and not is_granted('ROLE_BU') and not is_granted('ROLE_PDG') %}
+      
+        <li class="nav-item"><a class="nav-link" href="{{ path('app_project_index') }}">Projets</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ path('app_notification_index') }}">Notifications</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ path('app_project_file_index') }}">Fichiers</a></li>
+
+    {% elseif is_granted('ROLE_BU') %}
+    
+        <li class="nav-item"><a class="nav-link" href="{{ path('app_project_index') }}">Projets</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ path('app_task_index') }}">Tâches</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ path('app_project_file_index') }}">Fichiers</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ path('app_project_log_index') }}">Journaux</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ path('app_notification_index') }}">Notifications</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ path('app_departement_index') }}">Départements</a></li>
+
+    {% elseif is_granted('ROLE_PDG') %}
+     
+        <li class="nav-item"><a class="nav-link" href="{{ path('app_project_index') }}">Projets</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ path('app_task_index') }}">Tâches</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ path('app_project_file_index') }}">Fichiers</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ path('app_project_log_index') }}">Journaux</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ path('app_notification_index') }}">Notifications</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ path('app_departement_index') }}">Départements</a></li>
+
+    {% else %}
+        {# Pour les utilisateurs non connectés ou sans rôle #}
+        <li class="nav-item"><a class="nav-link disabled" href="#">Accès restreint</a></li>
+    {% endif %}
+</ul>
+
 
             <ul class="navbar-nav ms-auto d-flex align-items-center gap-3">
                 {% if app.user %}
@@ -230,3 +250,5 @@
     <script src="https://cdnjs.com/libraries/Chart.js" type="javascript"></script>
 </body>
 </html>
+
+

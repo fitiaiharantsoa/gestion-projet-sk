@@ -31,4 +31,20 @@ class TaskRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    public function findPaginatedTask(int $page = 1, int $limit = 10): array{
+        $offset = ($page - 1) *$limit;
+        return $this->createQueryBuilder('t')
+        ->orderBy('t.id', 'ASC')
+        ->setFirstResult($offset)
+        ->setMaxResults($limit)
+        ->getQuery()
+        ->getResult();
+    }
+
+    public function countAllTask(): int{
+        return $this->createQueryBuilder('t')
+            ->select('COUNT(t.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

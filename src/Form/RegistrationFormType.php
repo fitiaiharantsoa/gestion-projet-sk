@@ -2,9 +2,13 @@
 
 namespace App\Form;
 
+use App\Entity\Departement;
 use App\Entity\User;
+use App\Repository\DepartementRepository;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -14,6 +18,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class RegistrationFormType extends AbstractType
 {
+    
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -33,6 +38,15 @@ class RegistrationFormType extends AbstractType
             ])
             ->add('prenom')
             ->add('nom')
+            ->add('departement',  EntityType::class, [
+                'label'=>'Département',
+                'class'=>Departement::class,
+                'choice_label'=>fn(Departement $departement) => $departement->getNom(),
+                'query_builder' => function (DepartementRepository $departementRepository) {
+                    return $departementRepository->createQueryBuilder('d')
+                        ->orderBy('d.nom', 'ASC');
+                },
+            ])
             ->add('plainPassword', PasswordType::class, [
                 // instead of being set onto the object directly,
                 // this is read and encoded in the controller

@@ -10,6 +10,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface;
+use App\Entity\Departement;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -48,10 +49,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $prenom = null;
 
-    // **AJOUT de la propriété departement**
-    #[ORM\ManyToOne(targetEntity: Departement::class)]
-    #[ORM\JoinColumn(nullable: true)]
-    private ?Departement $departement = null;
+
 
     /**
      * @var Collection<int, ProjectLog>
@@ -64,6 +62,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
      */
     #[ORM\OneToMany(targetEntity: Departement::class, mappedBy: 'chef')]
     private Collection $departements;
+
+    #[ORM\ManyToOne(inversedBy: 'users')]
+    private ?Departement $departement = null;
 
     public function __construct()
     {
@@ -111,16 +112,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         return $this;
     }
 
-    public function getDepartement(): ?Departement
-    {
-        return $this->departement;
-    }
-
-    public function setDepartement(?Departement $departement): static
-    {
-        $this->departement = $departement;
-        return $this;
-    }
+  
 
     public function getUserIdentifier(): string
     {
@@ -268,5 +260,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     public function __toString(): string
     {
         return $this->getFullName();
+    }
+
+
+
+    public function setDepartement(?Departement $departement): static
+    {
+        $this->departement = $departement;
+
+        return $this;
+    }
+
+
+    public function getDepartement (): ?Departement
+    {
+       return $this->departement;
     }
 }

@@ -1,17 +1,18 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Notification index{% endblock %}
+{% block title %}Listes des notifications{% endblock %}
 
 {% block body %}
-    <h1>Notification index</h1>
+    <h1>Listes des Notifications</h1>
 
     <table class="table">
         <thead>
             <tr>
                 <th>Id</th>
                 <th>Message</th>
-                <th>Seen</th>
-                <th>CreatedAt</th>
+                <th>Vu</th>
+                <th>Date de création
+                </th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -23,17 +24,17 @@
                 <td>{{ notification.seen ? 'Yes' : 'No' }}</td>
                 <td>{{ notification.createdAt ? notification.createdAt|date('Y-m-d H:i:s') : '' }}</td>
                 <td>
-                    <a href="{{ path('app_notification_show', {'id': notification.id}) }}">show</a>
-                    <a href="{{ path('app_notification_edit', {'id': notification.id}) }}">edit</a>
+                    <a href="{{ path('app_notification_show', {'id': notification.id}) }}">Voir</a>
+                    <a href="{{ path('app_notification_edit', {'id': notification.id}) }}">Modifier</a>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="5">no records found</td>
+                <td colspan="5">Aucune Notification</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
-    <a href="{{ path('app_notification_new') }}">Create new</a>
+    <a href="{{ path('app_notification_new') }}">Nouveau</a>
 {% endblock %}
