@@ -23,13 +23,16 @@ class Departement
     private ?User $chef = null;
 
     #[ORM\OneToMany(mappedBy: 'departement', targetEntity: Project::class)]
-private Collection $projects;
+    private Collection $projects;
 
     /**
      * @var Collection<int, User>
      */
     #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'departement')]
     private Collection $users;
+
+    #[ORM\ManyToOne(inversedBy: 'departements')]
+    private ?BU $bu = null;
 
     public function __construct()
     {
@@ -91,6 +94,21 @@ private Collection $projects;
                 $user->setDepartement(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getProjects(): Collection{
+        return $this->projects;
+    }
+    public function getBu(): ?BU
+    {
+        return $this->bu;
+    }
+
+    public function setBu(?BU $bu): static
+    {
+        $this->bu = $bu;
 
         return $this;
     }

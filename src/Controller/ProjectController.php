@@ -27,9 +27,40 @@ final class ProjectController extends AbstractController
     }
 
     #[Route('', name: 'app_project_index', methods: ['GET'])]
-    public function index(ProjectRepository $projectRepository, DepartementRepository $departementRepository,UserInterface $user, Request $request): Response
+    public function index(ProjectRepository $projectRepository, DepartementRepository $departementRepository, UserInterface $user, Request $request): Response
     {
-        $departementDeUser = $departementRepository->findOneBy(['chef'=>$this->getUser()]);
+
+        if (in_array('ROLE_BU', $this->getUser()->getRoles())) {
+            $BuUser = $this->getUser()->getBus();
+            $departementUser = [];
+
+            foreach ($BuUser as $key => $value) {
+                $dep = $value->getDepartements();
+                foreach ($dep as $departement) {
+                    $departementUser[] = $departement->getId();
+                }
+            }
+
+            $departementUser = array_unique($departementUser);
+
+            $page = $request->query->getInt('page', 1);
+            $limit = 10;
+            $offset = ($page - 1) * $limit;
+            $current_page = $page;
+            $projectsReturn = $projectRepository->findBy(['departement'=>$departementUser], ['createdAt' => 'DESC'], $limit, $offset);
+
+            $totalProjects =count($projectsReturn);
+            $totalPages = ceil(count($projectsReturn) / $limit);
+
+            return $this->render('project/index.html.twig', [
+                'projects' => $projectsReturn,
+                'current_page' => $current_page,
+                'total_pages' => $totalPages,
+                'total_projects' => $totalProjects,
+            ]);
+        }
+
+        $departementDeUser = $departementRepository->findOneBy(['chef' => $this->getUser()]);
         $page = $request->query->getInt('page', 1);
         $limit = 10;
         $offset = ($page - 1) * $limit;
@@ -38,12 +69,22 @@ final class ProjectController extends AbstractController
         $projects = $projectRepository->findAll();
         $totalProjects = $projectRepository->count([]);
         $totalPages = ceil($totalProjects / $limit);
-        $project_encours = $projectRepository->findBy(['statut'=>'en cours']);
-        $project_a_faire = $projectRepository->findBy(['statut'=> 'à faire']);
-        $project_bloque = $projectRepository->findBy(['statut'=> 'bloqué']);
-        $project_termine = $projectRepository->findBy(['statut'=> 'terminé']);
+        $project_encours = $projectRepository->findBy(['statut' => 'en cours']);
+        $project_a_faire = $projectRepository->findBy(['statut' => 'à faire']);
+        $project_bloque = $projectRepository->findBy(['statut' => 'bloqué']);
+        $project_termine = $projectRepository->findBy(['statut' => 'terminé']);
         $listeCouleur = [
-            '#FFC1CF','#F13030','#5A0001','#22181C', '#F6E8EA', '#F45B69', '#2A2D43','#414361','#7F2CCB', '#FF84E8', '#FFA9E7'
+            '#FFC1CF',
+            '#F13030',
+            '#5A0001',
+            '#22181C',
+            '#F6E8EA',
+            '#F45B69',
+            '#2A2D43',
+            '#414361',
+            '#7F2CCB',
+            '#FF84E8',
+            '#FFA9E7'
         ];
         $progressionParUser = [];
         $progressionParDepartement = [];
@@ -97,17 +138,17 @@ final class ProjectController extends AbstractController
             'progressionParUser' => $progressionParUser,
             'progressionParDepartement' => $progressionParDepartement,
             'progressionGlobale' => $progressionGlobale,
-            'nomdep'=>$nomdepartement,
-            'couleur'=>$listeCouleur,
-            'total_projet'=>count($projects),
-            'total_encours'=>count($project_encours),
-            'total_a_faire'=>count($project_a_faire),
-            'total_bloque'=>count($project_bloque),
-            'total_termine'=>count($project_termine),
-            'departement_user'=>$departementDeUser,
-            'current_page'=>$current_page,
-            'total_pages'=>$totalPages,
-            'total_projects'=>$totalProjects,
+            'nomdep' => $nomdepartement,
+            'couleur' => $listeCouleur,
+            'total_projet' => count($projects),
+            'total_encours' => count($project_encours),
+            'total_a_faire' => count($project_a_faire),
+            'total_bloque' => count($project_bloque),
+            'total_termine' => count($project_termine),
+            'departement_user' => $departementDeUser,
+            'current_page' => $current_page,
+            'total_pages' => $totalPages,
+            'total_projects' => $totalProjects,
         ]);
     }
 
@@ -116,7 +157,7 @@ final class ProjectController extends AbstractController
     {
         $project = new Project();
         $form = $this->createForm(ProjectType::class, $project, [
-            'attr'=>['class'=>'container form-control']
+            'attr' => ['class' => 'container form-control']
         ]);
         $form->handleRequest($request);
 
@@ -146,23 +187,23 @@ final class ProjectController extends AbstractController
         $tasks = $project->getTasks();
         $total = count($tasks);
         $progressSum = 0;
-    
+
         foreach ($tasks as $task) {
             $progressSum += $task->getProgression() ?? 0;
         }
-    
-        $averageProgress = $total > 0 ? (int)($progressSum / $total) : 0;
-    
+
+        $averageProgress = $total > 0 ? (int) ($progressSum / $total) : 0;
+
         // Récupération des logs pour ce projet
         $logs = $this->projectLogService->getLogsForProject($project);
-    
+
         return $this->render('project/show.html.twig', [
             'project' => $project,
             'progressionGlobale' => $averageProgress,
             'logs' => $logs,
         ]);
     }
-    
+
 
     #[Route('/{id}/edit', name: 'app_project_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Project $project, EntityManagerInterface $entityManager): Response
@@ -206,7 +247,7 @@ final class ProjectController extends AbstractController
             $handle = fopen('php://output', 'w');
 
             // Ajout du BOM UTF-8 pour éviter les problèmes d'encodage sous Excel
-            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+            fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
             // En-têtes du fichier CSV
             fputcsv($handle, ['ID', 'Titre', 'Département', 'Statut', 'Date de début', 'Deadline']);

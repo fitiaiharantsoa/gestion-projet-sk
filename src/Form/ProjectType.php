@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Entity\BU;
 use App\Entity\Departement;
 use App\Entity\Project;
 use App\Entity\User;
@@ -39,16 +40,14 @@ class ProjectType extends AbstractType
                 'attr'=>['class'=>'form-control mb-2'],
                 'required'=>true
             ])
-            ->add('bu', ChoiceType::class, [
-                'label'=>"BU",
-                'choices'=>[
-                    "Yitro consulting"=>"yitro-consulting",
-                    "Sk travel"=>"sk_travel"
-                ],
-                'required'=>true,
-                'label_attr'=>['class'=>'form-label mt-2'],
-                'attr'=>['class'=>'form-select ']
-            ])
+            // ->add('bu', EntityType::class, [
+            //     'label'=>"BU",
+            //     'class'=>BU::class,
+            //     'choice_label'=>'nom',
+            //     'required'=>true,
+            //     'label_attr'=>['class'=>'form-label mt-2'],
+            //     'attr'=>['class'=>'form-select ']
+            // ])
             ->add('statut', ChoiceType::class, [
                 'label'=>'Status',
                 'label_attr'=>['class'=>'form-label mt-2'],

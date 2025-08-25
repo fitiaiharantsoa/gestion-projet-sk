@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}BU index{% endblock %}
+
+{% block body %}
+<h1>Liste des BU</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Nom</th>
+            <th>Responsable</th>
+            <th>actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for b_u in b_us %}
+        <tr>
+            <td>{{ b_u.id }}</td>
+            <td>{{ b_u.nom }}</td>
+            <td>{{ b_u.responsable.nom }} {{ b_u.responsable.prenom }}</td>
+            <td>
+                <a href="{{ path('app_b_u_show', {'id': b_u.id}) }}">Voir</a>
+                {% if 'ROLE' in app.user.roles %}
+                <a href="{{ path('app_b_u_edit', {'id': b_u.id}) }}">Modifier</a>
+                {% endif %}
+
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="3">Aucun BU</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% if 'ROLE_PDG' in app.user.roles %}
+<a href="{{ path('app_b_u_new') }}">Nouveau</a>
+{% endif %}
+{% endblock %}

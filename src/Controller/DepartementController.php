@@ -24,7 +24,11 @@ final class DepartementController extends AbstractController
         $offset = ($page - 1) * $limit;
 
 
-        $departements = $departementRepository->findBy([], ['nom' => 'ASC'], $limit, $offset);
+        if (in_array('ROLE_BU', $this->getUser()->getRoles())) {
+            $departements = $departementRepository->findBy(['chef'=> $this->getUser()->getId()], ['nom' => 'ASC'], $limit, $offset);
+        }else{
+            $departements = $departementRepository->findBy([], ['nom' => 'ASC'], $limit, $offset);
+        }
         $listeProjetParDepartement = [];
         $listeMembreDepartement = [];
         foreach ($departements as $key => $value) {
@@ -44,7 +48,7 @@ final class DepartementController extends AbstractController
             'nbr_membre'=>$listeMembreDepartement,
             'current_page' =>$page,
             'total_departements' => count($departements),
-            'total_pages' => ceil(count($departementRepository->findAll()) / $limit),
+            'total_pages' => ceil(count($departements) / $limit),
         ]);
     }
 

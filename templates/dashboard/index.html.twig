@@ -103,6 +103,8 @@
         data: data_nbr_user,
     };
     const chart_user = new Chart(chart_user_element, config_nbr_user);
+
+    
 </script>
 {% endif %}
 <!-- Ajout d’une section Utilisateurs avec lien vers la liste -->
@@ -111,5 +113,75 @@
         Voir la liste des utilisateurs
     </a>
 </div> #}
+
+
+{% if 'ROLE_BU' in app.user.roles %}
+<div class=" " style="display: flex; flex-wrap: wrap; justify-content: space-evenly; gap: 20px;">
+
+
+    <div class="p-4 shadow rounded bg-light" style="width: 18rem;">
+        <a href="{{ path('app_project_index') }}" class="btn"><h5>Projets ({{ projet|length }}) </h5></a>
+        <canvas id="projet_chart_bu"></canvas>
+    </div>
+    <div class="p-4 shadow rounded bg-light" style="width: 18rem;">
+        <a href="{{ path('app_task_index') }}" class="btn"><h5>Tâches ({{ task|length }})</h5></a>
+        <canvas id="tache_chart_bu"></canvas>
+    </div>
+</div>
+<script>
+    const chart_projet_element_bu = document.getElementById("projet_chart_bu");
+    const data_nbr_projet_bu = {
+        labels: [
+            'A faire',
+            'En cours',
+            'Bloqué',
+            'Terminé'
+        ],
+        datasets: [{
+            label: "Répartition des tâches",
+            data: ['{{ projet_a_faire|length }}', '{{ projet_en_cours|length }}', '{{ projet_bloque|length }}', '{{ projet_termine|length }}'],
+            backgroundColor: [
+                '#A4B494',
+                '#BEC5AD',
+                '#3B5249',
+                '#519872'
+            ],
+            hoverOffset: 10
+        }]
+    };
+    const config_nbr_projet_bu = {
+        type: 'doughnut',
+        data: data_nbr_projet_bu,
+    };
+    const chart_projet_bu = new Chart(chart_projet_element_bu, config_nbr_projet_bu);
+
+    
+    const chart_tache_element_bu = document.getElementById("tache_chart_bu");
+    const data_nbr_tache_bu = {
+        labels: [
+            'A faire',
+            'En cours',
+            'Bloqué',
+            'Terminé'
+        ],
+        datasets: [{
+            label: "Répartition des tâches",
+            data: ['{{ task_a_faire|length }}', '{{ task_en_cours|length }}', '{{ task_bloque|length }}', '{{ task_termine|length }}'],
+            backgroundColor: [
+                '#A4B494',
+                '#BEC5AD',
+                '#3B5249',
+                '#519872'
+            ],
+            hoverOffset: 10
+        }]
+    };
+    const config_nbr_tache_bu = {
+        type: 'doughnut',
+        data: data_nbr_tache_bu,
+    };
+    const chart_tache_bu = new Chart(chart_tache_element_bu, config_nbr_tache_bu);
+</script>
+{% endif %}
 
 {% endblock %}

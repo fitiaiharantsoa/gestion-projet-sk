@@ -13,6 +13,7 @@
                 <th>Chef</th>
                 <th>Nombre Membre</th>
                 <th>Nombre de projet</th>
+                <th>BU</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -24,6 +25,7 @@
                 <td>{{ departement.chef }}</td>
                 <td>{{ nbr_membre[departement.id] }}</td>
                 <td>{{ nbr_projet[departement.id] }}</td>
+                <td>{{ departement.bu.nom|default('') }}</td>
 
                 <td>
                     <a href="{{ path('app_departement_show', {'id': departement.id}) }}">Voir</a>

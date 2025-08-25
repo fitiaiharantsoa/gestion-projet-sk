@@ -64,10 +64,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[ORM\ManyToOne(inversedBy: 'users')]
     private ?Departement $departement = null;
 
+    /**
+     * @var Collection<int, BU>
+     */
+    #[ORM\OneToMany(targetEntity: BU::class, mappedBy: 'responsable')]
+    private Collection $bUs;
+
     public function __construct()
     {
         $this->projectLogs = new ArrayCollection();
         $this->departements = new ArrayCollection();
+        $this->bUs = new ArrayCollection();
     }
 
     // --- Getters and setters ---
@@ -214,6 +221,47 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         return $this;
     }
 
+    public function getDepartement(): ?Departement
+    {
+        return $this->departement;
+    }
+
+    public function setDepartement(?Departement $departement): static
+    {
+        $this->departement = $departement;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, BU>
+     */
+    public function getBUs(): Collection
+    {
+        return $this->bUs;
+    }
+
+    public function addBUs(BU $bUs): static
+    {
+        if (!$this->bUs->contains($bUs)) {
+            $this->bUs->add($bUs);
+            $bUs->setResponsable($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBUs(BU $bUs): static
+    {
+        if ($this->bUs->removeElement($bUs)) {
+            // set the owning side to null (unless already changed)
+            if ($bUs->getResponsable() === $this) {
+                $bUs->setResponsable(null);
+            }
+        }
+
+        return $this;
+    }
+
     // TwoFactorInterface methods...
 
     public function getEmailAuthRecipient(): string
@@ -222,9 +270,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     }
 
     public function isEmailAuthEnabled(): bool
-{
-    return $this->isVerified && $this->isEmailAuthEnabled;
-}
+    {
+        return $this->isVerified && $this->isEmailAuthEnabled;
+    }
 
 
     public function setIsEmailAuthEnabled(bool $isEnabled): static
@@ -257,20 +305,5 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     public function __toString(): string
     {
         return $this->getFullName();
-    }
-
-
-
-    public function setDepartement(?Departement $departement): static
-    {
-        $this->departement = $departement;
-
-        return $this;
-    }
-
-
-    public function getDepartement (): ?Departement
-    {
-       return $this->departement;
     }
 }

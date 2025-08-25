@@ -115,7 +115,7 @@ class KanbanController extends AbstractController
         $currentDate = new \DateTime('now');   
         $dateTimeImmutable = DateTimeImmutable::createFromMutable($currentDate);
         $task->setCreatedAt($dateTimeImmutable);
-
+        $task->setCreateur($this->getUser()->getId());
         $this->entityManager->persist($task);
         $this->entityManager->flush();
 

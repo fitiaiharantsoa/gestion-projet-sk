@@ -27,10 +27,10 @@
     </ul> #}
 {% endif %}
 
-{% if 'ROLE_BU' in app.user.roles %}
+{# {% if 'ROLE_BU' in app.user.roles %}
     {% set depId = departement_user ? departement_user.id : null %}
     <h3>Progression de votre département: {{ progressionParDepartement[depId]|default(0) }}%</h3>
-{% endif %}
+{% endif %} #}
 
 {% if 'ROLE_USER' in app.user.roles %}
     {% set userId = app.user.id %}
@@ -141,6 +141,7 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+{% if 'ROLE_PDG' in app.user.roles %}
 <script>
     const chart_projet_element = document.getElementById("nbr_projet_chart")
     const data_nbr_projet = {
@@ -195,4 +196,5 @@
       const myChart = new Chart(mc, config)
 </script>
 
+{% endif %}
 {% endblock %}
