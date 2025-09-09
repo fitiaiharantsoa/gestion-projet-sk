@@ -1,106 +1,71 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Project{% endblock %}
+{% block title %}Projet {{ project.titre }}{% endblock %}
 
 {% block body %}
-    <h1>Project</h1>
+<h2 class="text-center mb-4">Projet : {{ project.titre }}</h2>
 
-    <h3>Progression globale du projet :</h3>
-
-    <div class="progress mb-3" style="height: 25px;">
-        <div class="progress-bar 
-            {% if progressionGlobale == 100 %} bg-success
-            {% elseif progressionGlobale >= 50 %} bg-info
-            {% else %} bg-warning {% endif %}"
-            role="progressbar"
-            style="width: {{ progressionGlobale }}%;"
-            aria-valuenow="{{ progressionGlobale }}"
-            aria-valuemin="0"
-            aria-valuemax="100">
-            {{ progressionGlobale }}%
-        </div>
+<h4>Progression globale du projet :</h4>
+<div class="progress mb-3" style="height: 25px;">
+    <div class="progress-bar 
+        {% if progressionGlobale == 100 %} bg-success
+        {% elseif progressionGlobale >= 50 %} bg-info
+        {% else %} bg-warning {% endif %}" 
+        role="progressbar"
+        style="width: {{ progressionGlobale }}%;" 
+        aria-valuenow="{{ progressionGlobale }}" 
+        aria-valuemin="0" 
+        aria-valuemax="100">
+        {{ progressionGlobale }}%
     </div>
+</div>
 
-    <p>
-        <strong>État du projet :</strong>
-        <span class="badge 
-            {% if progressionGlobale == 100 %} bg-success
-            {% elseif progressionGlobale >= 50 %} bg-info
-            {% else %} bg-secondary {% endif %}">
-            {% if progressionGlobale == 100 %}
-                Terminé
-            {% elseif progressionGlobale >= 50 %}
-                En cours
-            {% else %}
-                À démarrer 
-            {% endif %}
-        </span>
-    </p>
+<p>
+    <strong>État du projet :</strong>
+    <span class="badge 
+        {% if progressionGlobale == 100 %} bg-success
+        {% elseif progressionGlobale >= 50 %} bg-info
+        {% else %} bg-secondary {% endif %}">
+        {% if progressionGlobale == 100 %}
+            Terminé
+        {% elseif progressionGlobale >= 50 %}
+            En cours
+        {% else %}
+            À démarrer 
+        {% endif %}
+    </span>
+</p>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ project.id }}</td>
-            </tr>
-            <tr>
-                <th>Titre</th>
-                <td>{{ project.titre }}</td>
-            </tr>
-            <tr>
-                <th>Description</th>
-                <td>{{ project.description }}</td>
-            </tr>
-            <tr>
-                <th>Departement</th>
-                <td>{{ project.departement.nom }}</td>
-            </tr>
-            <tr>
-                <th>BU</th>
-                <td>{{ project.departement.bu }}</td>
-            </tr>
-            <tr>
-                <th>DateDebut</th>
-                <td>{{ project.dateDebut ? project.dateDebut|date('Y-m-d') : '' }}</td>
-            </tr>
-            <tr>
-                <th>DateFin</th>
-                <td>{{ project.dateFin ? project.dateFin|date('Y-m-d') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Statut</th>
-                <td>{{ project.statut }}</td>
-            </tr>
-            <tr>
-                <th>Categorie</th>
-                <td>{{ project.categorie }}</td>
-            </tr>
-            <tr>
-                <th>Créer le</th>
-                <td>{{ project.createdAt ? project.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Modifiée le </th>
-                <td>{{ project.updatedAt ? project.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-        </tbody>
-    </table>
+<table class="table table-striped">
+    <tbody>
+        <tr><th>Id</th><td>{{ project.id }}</td></tr>
+        <tr><th>Titre</th><td>{{ project.titre }}</td></tr>
+        <tr><th>Description</th><td>{{ project.description }}</td></tr>
+        <tr><th>Département</th><td>{{ project.departement.nom }}</td></tr>
+        <tr><th>BU</th><td>{{ project.departement.bu.nom|default('') }}</td></tr>
+        <tr><th>Date de début</th><td>{{ project.dateDebut ? project.dateDebut|date('Y-m-d') : '' }}</td></tr>
+        <tr><th>Date de fin</th><td>{{ project.dateFin ? project.dateFin|date('Y-m-d') : '' }}</td></tr>
+        <tr><th>Statut</th><td>{{ project.statut }}</td></tr>
+        <tr><th>Catégorie</th><td>{{ project.categorie }}</td></tr>
+        <tr><th>Créé le</th><td>{{ project.createdAt ? project.createdAt|date('Y-m-d H:i:s') : '' }}</td></tr>
+        <tr><th>Modifié le</th><td>{{ project.updatedAt ? project.updatedAt|date('Y-m-d H:i:s') : '' }}</td></tr>
+    </tbody>
+</table>
 
-    <a href="{{ path('project_kanban', {'id': project.id}) }}">Retour</a>
-    <a href="{{ path('app_project_edit', {'id': project.id}) }}">Modifier</a>
-
+<div class="d-flex gap-2 mb-4">
+    <a href="{{ path('project_kanban', {'id': project.id}) }}" class="btn btn-primary">Retour au Kanban</a>
+    <a href="{{ path('app_project_edit', {'id': project.id}) }}" class="btn btn-warning">Modifier</a>
     {{ include('project/_delete_form.html.twig') }}
+</div>
 
-    <h2>Historique d’activité</h2>
-
+<h3>Historique d’activité</h3>
 {% if logs is empty %}
     <p>Aucun log disponible pour ce projet.</p>
 {% else %}
     <ul class="list-group">
         {% for log in logs %}
             <li class="list-group-item">
-                <small class="text-muted">{{ log.createdAt ? log.createdAt|date('Y-m-d H:i:s') : '' }}</small>
-                — {{ log.message }}
+                <small class="text-muted">{{ log.createdAt ? log.createdAt|date('Y-m-d H:i:s') : '' }}</small> — {{ log.message }}
             </li>
         {% endfor %}
     </ul>

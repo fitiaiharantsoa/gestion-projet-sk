@@ -1,19 +1,23 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Listes des notifications{% endblock %}
+{% block title %}Liste des notifications{% endblock %}
 
 {% block body %}
-    <h1>Listes des Notifications</h1>
+<h2 class="text-center mb-4" style="font-size:1.6rem; font-weight:600;">Liste des Notifications</h2>
 
-    <table class="table">
+<div class="mb-3 text-end">
+    <a href="{{ path('app_notification_new') }}" class="btn btn-new">Nouveau</a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-modern">
         <thead>
             <tr>
                 <th>Id</th>
                 <th>Message</th>
                 <th>Vu</th>
-                <th>Date de création
-                </th>
-                <th>actions</th>
+                <th>Date de création</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -21,20 +25,89 @@
             <tr>
                 <td>{{ notification.id }}</td>
                 <td>{{ notification.message }}</td>
-                <td>{{ notification.seen ? 'Yes' : 'No' }}</td>
+                <td>{{ notification.seen ? 'Oui' : 'Non' }}</td>
                 <td>{{ notification.createdAt ? notification.createdAt|date('Y-m-d H:i:s') : '' }}</td>
                 <td>
-                    <a href="{{ path('app_notification_show', {'id': notification.id}) }}">Voir</a>
-                    <a href="{{ path('app_notification_edit', {'id': notification.id}) }}">Modifier</a>
+                    <a href="{{ path('app_notification_show', {'id': notification.id}) }}" class="btn btn-view btn-sm">Voir</a>
+                    <a href="{{ path('app_notification_edit', {'id': notification.id}) }}" class="btn btn-edit btn-sm">Modifier</a>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="5">Aucune Notification</td>
+                <td colspan="5" class="text-center">Aucune notification</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
+</div>
 
-    <a href="{{ path('app_notification_new') }}">Nouveau</a>
+<style>
+/* Tableau stylé */
+.table-modern {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.5rem;
+}
+
+.table-modern thead th {
+    background-color: #f3f4f6;
+    color: #0f172a;
+    font-weight: 600;
+    border-radius: 0.5rem;
+}
+
+.table-modern tbody tr {
+    background-color: #ffffff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    transition: transform 0.2s;
+}
+
+.table-modern tbody tr:hover {
+    transform: translateY(-2px);
+}
+
+.table-modern th, .table-modern td {
+    padding: 0.75rem 1rem;
+    vertical-align: middle;
+}
+
+/* Boutons */
+.btn-new {
+    background-color: #60a5fa;
+    color: white;
+    padding: 0.4rem 0.9rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+}
+
+.btn-new:hover {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.btn-view {
+    background-color: #34d399;
+    color: white;
+    border-radius: 0.5rem;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+}
+
+.btn-view:hover {
+    background-color: #10b981;
+}
+
+.btn-edit {
+    background-color: #facc15;
+    color: white;
+    border-radius: 0.5rem;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+}
+
+.btn-edit:hover {
+    background-color: #eab308;
+}
+</style>
 {% endblock %}

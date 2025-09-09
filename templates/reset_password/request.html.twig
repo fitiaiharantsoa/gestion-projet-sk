@@ -1,33 +1,47 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Réinitialiser votre mot de passe{% endblock %}
+{% block title %}Mot de passe oublié{% endblock %}
 
 {% block body %}
-    {% for flash_error in app.flashes('reset_password_error') %}
-        <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
-    {% endfor %}
-    <h1>Réinitialiser votre mot de passe</h1>
-
-    {{ form_start(requestForm) }}
-        {# {{ form_row(requestForm.email) }} #}
-        {% block form_row %}
-           <div class="form-floating">
-                {{ form_widget(requestForm.email, {'attr': {'class': 'form-control'}}) }}
-                {{ form_label(requestForm.email) }}
-                {{ form_errors(requestForm.email) }}
-            </div>
-            <div class="mb-3">
-                {{ form_rest(requestForm) }}
-           </div>
-        {% endblock %}
-        <div>
-            <small>
-                {# Enter your email address, and we will send you a
-                link to reset your password. #}
-                Entrez votre adresse e-mail, et nous vous enverrons un lien pour réinitialiser votre mot de passe.
-            </small>
+<div class="container vh-100 d-flex justify-content-center align-items-center">
+    <div class="card shadow-lg border-0 p-5 w-100" style="max-width: 450px; border-radius: 15px;">
+        
+        <!-- Logo et titre -->
+        <div class="text-center mb-4">
+            <img src="{{ asset('images/sk-logo.png') }}" alt="Logo SK"
+                 style="max-width: 80px; height: auto; margin-bottom: 10px;">
+            <h3 class="fw-bold">🔒 Réinitialiser le mot de passe</h3>
+            <p class="text-muted small">
+                Saisissez votre adresse e-mail, nous vous enverrons un lien pour réinitialiser votre mot de passe.
+            </p>
         </div>
 
-        <button class="btn btn-primary">Envoyer</button>
-    {{ form_end(requestForm) }}
+        <!-- Messages d'erreur -->
+        {% for flash_error in app.flashes('reset_password_error') %}
+            <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
+        {% endfor %}
+
+        <!-- Formulaire -->
+        {{ form_start(requestForm) }}
+            <div class="form-floating mb-4">
+                {{ form_widget(requestForm.email, {'attr': {'class': 'form-control rounded-3', 'placeholder': 'Adresse e-mail'}}) }}
+                {{ form_label(requestForm.email, 'Adresse e-mail') }}
+                {{ form_errors(requestForm.email) }}
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary rounded-3 py-2 fw-bold">
+                    📩 Envoyer le lien
+                </button>
+            </div>
+        {{ form_end(requestForm) }}
+
+        <!-- Retour connexion -->
+        <div class="text-center mt-3">
+            <a href="{{ path('app_login') }}" class="text-decoration-none text-muted">
+                🔙 Retour à la connexion
+            </a>
+        </div>
+    </div>
+</div>
 {% endblock %}

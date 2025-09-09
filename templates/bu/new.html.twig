@@ -1,11 +1,36 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New BU{% endblock %}
+{% block title %}Nouveau BU{% endblock %}
 
 {% block body %}
-    <h1>Nouveau BU</h1>
+    <!-- Titre centré -->
+    <h1 class="text-center mb-4" style="font-size: 1.5rem;">Nouveau BU</h1>
 
-    {{ include('bu/_form.html.twig') }}
+    <!-- Formulaire centré -->
+    <div class="d-flex flex-column align-items-center">
+        {{ include('bu/_form.html.twig') }}
+    </div>
 
-    <a href="{{ path('app_b_u_index') }}">back to list</a>
+    <!-- Bouton Retour en bas à droite -->
+    <div class="mt-4 d-flex justify-content-end">
+        <a href="{{ path('app_b_u_index') }}" class="btn btn-back btn-sm">Retour</a>
+    </div>
+
+    <style>
+    /* Bouton Retour en bas à droite */
+    .btn-back {
+        background-color: #e5e7eb; /* gris doux */
+        color: #1e293b;
+        border: none;
+        padding: 0.4rem 0.9rem;
+        font-size: 0.875rem;
+        border-radius: 0.5rem;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+
+    .btn-back:hover {
+        background-color: #d1d5db; /* gris un peu plus foncé au hover */
+    }
+    </style>
 {% endblock %}

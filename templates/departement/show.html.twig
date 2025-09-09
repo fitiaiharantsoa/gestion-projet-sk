@@ -3,68 +3,157 @@
 {% block title %}Département {{ departement.nom }}{% endblock %}
 
 {% block body %}
-    <h1>Département {{ departement.nom }}</h1>
+<div class="departement-page">
+    <h2 class="text-center mb-4" style="font-size:1.6rem; font-weight:600;">Département {{ departement.nom }}</h2>
 
-    <div class="" style="display: flex; gap: 10px;" >
-        <h4 id="projets" style="text-decoration: underline;" class="btn">Projets</h4>
-        <h4 id="membre" class="btn">Membres</h4>
+    <div class="d-flex justify-content-center gap-3 mb-4">
+        <button id="projets" class="tab-btn active">Projets</button>
+        <button id="membre" class="tab-btn">Membres</button>
     </div>
-    <table class="table" id="liste_projet" >
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <th>Projet</th>
-                <th>Résponsable</th>
-            </tr>
-            {% for row in projet %}
-            <tr>
-                <td>{{ row.id }} </td>
-                <td><a href="{{ path('project_kanban', {'id': row.id}) }}" class="btn" title="Détails du projet">{{ row.titre }} </a></td>
-                <td><a href="{{ path('user_profile', {'id': row.responsable.id}) }} " class="btn" title="Détails du responsable">{{row.responsable}}</a> </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
 
-    
-    <table class="table" id="liste_membre" style="display: none;">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <th>Email</th>
-                <th>Nom</th>
-                <th>Prenom</th>
-            </tr>
-            {% for row in membres %}
-            <tr>
-                <td>{{row.id}}</td>
-                <td>{{row.email}}</td>
-                <td>{{row.nom}}</td>
-                <td>{{row.prenom}}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <a href="{{ path('app_departement_index') }}">Retour</a>
+    <div class="table-responsive">
+        <table class="table table-modern" id="liste_projet">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Projet</th>
+                    <th>Responsable</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in projet %}
+                <tr>
+                    <td>{{ row.id }}</td>
+                    <td><a href="{{ path('project_kanban', {'id': row.id}) }}" class="link-btn">{{ row.titre }}</a></td>
+                    <td><a href="{{ path('user_profile', {'id': row.responsable.id}) }}" class="link-btn">{{ row.responsable }}</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
-    <a href="{{ path('app_departement_edit', {'id': departement.id}) }}">Modifier</a>
-    <script>
-        document.getElementById('projets').addEventListener('click', (e)=>{
-            document.getElementById('liste_projet').style.display = 'table';
-            
-            document.getElementById('liste_membre').style.display = 'none';
-            document.getElementById('membre').style.textDecoration = 'none';
-            document.getElementById('projets').style.textDecoration = 'underline';
-            e.preventDefault();
-        })
-        document.getElementById('membre').addEventListener('click', (e)=>{
-            document.getElementById('liste_membre').style.display = 'table';
-            
-            document.getElementById('liste_projet').style.display = 'none';
-            document.getElementById('membre').style.textDecoration = 'underline';
-            document.getElementById('projets').style.textDecoration = 'none';
-            e.preventDefault();
-        })
-    </script>
-    {{ include('departement/_delete_form.html.twig') }}
+        <table class="table table-modern" id="liste_membre" style="display:none;">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Email</th>
+                    <th>Nom</th>
+                    <th>Prénom</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in membres %}
+                <tr>
+                    <td>{{ row.id }}</td>
+                    <td>{{ row.email }}</td>
+                    <td>{{ row.nom }}</td>
+                    <td>{{ row.prenom }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-4 d-flex justify-content-between">
+        <a href="{{ path('app_departement_index') }}" class="btn btn-back">Retour</a>
+        <div>
+            <a href="{{ path('app_departement_edit', {'id': departement.id}) }}" class="btn btn-edit">Modifier</a>
+            {{ include('departement/_delete_form.html.twig') }}
+        </div>
+    </div>
+</div>
+
+<style>
+/* Boutons Projets / Membres */
+.tab-btn {
+    background-color: #f3f4f6;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.tab-btn.active {
+    background-color: #60a5fa;
+    color: white;
+}
+
+/* Tableaux modernes */
+.table-modern {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.5rem;
+}
+.table-modern thead th {
+    background-color: #f3f4f6;
+    color: #0f172a;
+    font-weight: 600;
+    border-radius: 0.5rem;
+}
+.table-modern tbody tr {
+    background-color: #ffffff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    transition: transform 0.2s;
+}
+.table-modern tbody tr:hover {
+    transform: translateY(-2px);
+}
+.table-modern th, .table-modern td {
+    padding: 0.75rem 1rem;
+    vertical-align: middle;
+}
+
+/* Liens dans les tableaux */
+.link-btn {
+    text-decoration: none;
+    color: #10b981;
+}
+.link-btn:hover {
+    text-decoration: underline;
+}
+
+/* Boutons */
+.btn-back {
+    background-color: #60a5fa;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.9rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+.btn-back:hover {
+    background-color: #3b82f6;
+}
+.btn-edit {
+    background-color: #facc15;
+    color: white;
+    border-radius: 0.5rem;
+    padding: 0.4rem 0.9rem;
+    transition: all 0.2s;
+}
+.btn-edit:hover {
+    background-color: #eab308;
+}
+</style>
+
+<script>
+const projetsBtn = document.getElementById('projets');
+const membreBtn = document.getElementById('membre');
+const listeProjet = document.getElementById('liste_projet');
+const listeMembre = document.getElementById('liste_membre');
+
+projetsBtn.addEventListener('click', ()=>{
+    listeProjet.style.display = 'table';
+    listeMembre.style.display = 'none';
+    projetsBtn.classList.add('active');
+    membreBtn.classList.remove('active');
+});
+membreBtn.addEventListener('click', ()=>{
+    listeMembre.style.display = 'table';
+    listeProjet.style.display = 'none';
+    membreBtn.classList.add('active');
+    projetsBtn.classList.remove('active');
+});
+</script>
 {% endblock %}

@@ -1,12 +1,42 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Reset your password{% endblock %}
+{% block title %}Réinitialiser le mot de passe{% endblock %}
 
 {% block body %}
-    <h1>Reset your password</h1>
+<div class="container vh-100 d-flex justify-content-center align-items-center">
+    <div class="card shadow-lg border-0 p-5 w-100" style="max-width: 450px; border-radius: 15px;">
+        
+        <!-- Icône -->
+        <div class="text-center mb-4">
+            <img src="{{ asset('images/sk-logo.png') }}" alt="Logo SK"
+                 style="max-width: 80px; height: auto; margin-bottom: 10px;">
+            <h3 class="fw-bold">🔑 Réinitialiser votre mot de passe</h3>
+            <p class="text-muted small">
+                Choisissez un nouveau mot de passe sécurisé pour accéder à votre compte.
+            </p>
+        </div>
 
-    {{ form_start(resetForm) }}
-        {{ form_row(resetForm.plainPassword) }}
-        <button class="btn btn-primary">Reset password</button>
-    {{ form_end(resetForm) }}
+        <!-- Formulaire -->
+        {{ form_start(resetForm) }}
+            <div class="form-floating mb-4">
+                {{ form_widget(resetForm.plainPassword, {'attr': {'class': 'form-control rounded-3'}}) }}
+                {{ form_label(resetForm.plainPassword, 'Nouveau mot de passe') }}
+                {{ form_errors(resetForm.plainPassword) }}
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary rounded-3 py-2 fw-bold">
+                    ✅ Réinitialiser
+                </button>
+            </div>
+        {{ form_end(resetForm) }}
+
+        <!-- Lien retour -->
+        <div class="text-center mt-3">
+            <a href="{{ path('app_login') }}" class="text-decoration-none text-muted">
+                🔙 Retour à la connexion
+            </a>
+        </div>
+    </div>
+</div>
 {% endblock %}

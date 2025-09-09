@@ -1,4 +1,28 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn btn-primary">{{ button_label|default('Enregistrer') }}</button>
-{{ form_end(form) }}
+<div class="d-flex justify-content-center">
+    <div style="width: 400px;">
+        {{ form_start(form) }}
+            {{ form_widget(form) }}
+            <div class="text-center mt-3">
+                <button class="btn btn-primary">{{ button_label|default('Enregistrer') }}</button>
+            </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+
+<style>
+    .form-control, .form-select {
+        border-radius: 0.4rem;
+        padding: 0.5rem;
+    }
+
+    .btn-primary {
+        padding: 0.5rem 1rem;
+        border-radius: 0.4rem;
+        font-size: 0.9rem;
+        transition: background-color 0.2s;
+    }
+
+    .btn-primary:hover {
+        background-color: #0d6efdcc;
+    }
+</style>

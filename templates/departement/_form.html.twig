@@ -1,7 +1,8 @@
 {{ form_start(form) }}
-    {# {{ form_widget(form) }} #}
+
+<div class="form-container" style="max-width: 500px; margin: 0 auto;">
     <div class="form-floating mb-3">
-        {{ form_widget(form.nom, {'attr': {'class': 'form-control', 'placeholder': 'place'}}) }}
+        {{ form_widget(form.nom, {'attr': {'class': 'form-control', 'placeholder': 'Nom du département'}}) }}
         {{ form_label(form.nom) }}
         {{ form_errors(form.nom) }}
     </div>
@@ -15,5 +16,27 @@
         {{ form_label(form.bu) }}
         {{ form_errors(form.bu) }}
     </div>
-    <button class="btn btn-outline-primary">{{ button_label|default('Enregistrer') }}</button>
+
+    <div class="text-center">
+        <button type="submit" class="btn btn-enregistrer">{{ button_label|default('Enregistrer') }}</button>
+    </div>
+</div>
+
 {{ form_end(form) }}
+
+<style>
+.btn-enregistrer {
+    background-color: #60a5fa; /* bleu doux */
+    color: white;
+    padding: 0.5rem 1.2rem;
+    font-size: 0.95rem;
+    border: none;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+}
+
+.btn-enregistrer:hover {
+    background-color: #3b82f6;
+    color: white;
+}
+</style>

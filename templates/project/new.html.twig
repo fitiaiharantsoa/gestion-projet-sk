@@ -1,11 +1,32 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Project{% endblock %}
+{% block title %}Nouveau Projet{% endblock %}
 
 {% block body %}
-    <h1>Créer un nouveau projet</h1>
+<h2 class="text-center mb-4" style="font-size:1.6rem; font-weight:600;">Créer un nouveau projet</h2>
 
+<div class="d-flex justify-content-center">
     {{ include('project/_form.html.twig', {'button_label': 'Créer'}) }}
+</div>
 
-    <a href="{{ path('app_project_index') }}">Revenir à la liste</a>
+<div class="mt-3 text-center">
+    <a href="{{ path('app_project_index') }}" class="btn btn-back">Revenir à la liste</a>
+</div>
+
+<style>
+.btn-back {
+    background-color: #60a5fa;
+    color: white;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.btn-back:hover {
+    background-color: #3b82f6;
+    color: white;
+}
+</style>
 {% endblock %}

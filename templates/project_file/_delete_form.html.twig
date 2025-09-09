@@ -1,4 +1,12 @@
-<form method="post" action="{{ path('app_project_file_delete', {'id': project_file.id}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');">
+<form method="post" action="{{ path('app_project_file_delete', {'id': project_file.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce fichier ?');">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ project_file.id) }}">
-    <button class="btn">Supprimer</button>
+    <button class="btn btn-warning btn-sm">Supprimer</button>
 </form>
+
+<style>
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+        border-radius: 0.3rem;
+    }
+</style>

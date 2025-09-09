@@ -3,185 +3,157 @@
 {% block title %}Tableau de bord{% endblock %}
 
 {% block body %}
-<h2 class="mb-4">Bienvenue, {{ app.user.nom }} {{ app.user.prenom }}</h2>
-
+<h2 class="mb-4 text-center" style="color:#0f172a;">Bienvenue, {{ app.user.nom }} {{ app.user.prenom }}</h2>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 {% if 'ROLE_PDG' in app.user.roles %}
-<div class=" " style="display: flex; flex-wrap: wrap; justify-content: space-evenly; gap: 20px;">
+<div class="dashboard-container d-flex flex-wrap justify-content-evenly gap-4">
 
-
-    <div class="p-4 shadow rounded bg-light" style="width: 18rem;">
-        <a href="{{ path('app_project_index') }}" class="btn"><h5>Projets ({{nbr_projet}}) </h5></a>
+    <!-- Carte Projets -->
+    <div class="dashboard-card p-4 shadow-sm rounded-4 bg-light">
+        <a href="{{ path('app_project_index') }}" class="btn p-0 mb-3">
+            <h5 class="fw-bold">Projets ({{ nbr_projet }})</h5>
+        </a>
         <canvas id="projet_chart"></canvas>
     </div>
-    <div class="p-4 shadow rounded bg-light" style="width: 18rem;">
-        <a href="{{ path('app_task_index') }}" class="btn"><h5>Tâches ({{ nbr_tache }})</h5></a>
+
+    <!-- Carte Tâches -->
+    <div class="dashboard-card p-4 shadow-sm rounded-4 bg-light">
+        <a href="{{ path('app_task_index') }}" class="btn p-0 mb-3">
+            <h5 class="fw-bold">Tâches ({{ nbr_tache }})</h5>
+        </a>
         <canvas id="tache_chart"></canvas>
     </div>
-    <div class="p-4 shadow rounded bg-light" style="width: 18rem;">
-        <a href="{{ path('user_index') }}" class="btn">
-            <h5> Utilisateur  ({{ utilisateur }})</h5>
+
+    <!-- Carte Utilisateurs -->
+    <div class="dashboard-card p-4 shadow-sm rounded-4 bg-light">
+        <a href="{{ path('user_index') }}" class="btn p-0 mb-3">
+            <h5 class="fw-bold">Utilisateurs ({{ utilisateur }})</h5>
         </a>
         <canvas id="user_chart"></canvas>
     </div>
 
+</div>
+{% endif %}
+
+{% if 'ROLE_BU' in app.user.roles %}
+<div class="dashboard-container d-flex flex-wrap justify-content-evenly gap-4 mt-4">
+
+    <div class="dashboard-card p-4 shadow-sm rounded-4 bg-light">
+        <a href="{{ path('app_project_index') }}" class="btn p-0 mb-3">
+            <h5 class="fw-bold">Projets ({{ projet|length }})</h5>
+        </a>
+        <canvas id="projet_chart_bu"></canvas>
+    </div>
+
+    <div class="dashboard-card p-4 shadow-sm rounded-4 bg-light">
+        <a href="{{ path('app_task_index') }}" class="btn p-0 mb-3">
+            <h5 class="fw-bold">Tâches ({{ task|length }})</h5>
+        </a>
+        <canvas id="tache_chart_bu"></canvas>
+    </div>
 
 </div>
+{% endif %}
+
+<style>
+.dashboard-container {
+    gap: 20px;
+}
+
+.dashboard-card {
+    width: 18rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background-color: #f3f4f6 !important; /* fond neutre */
+}
+
+.dashboard-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.dashboard-card h5 {
+    color: #0f172a;
+    font-size: 1.2rem;
+}
+
+.dashboard-card a.btn {
+    text-decoration: none;
+}
+
+@media (max-width: 768px) {
+    .dashboard-card {
+        width: 100%;
+    }
+}
+</style>
+
 <script>
+    // Charts PDG
+    {% if 'ROLE_PDG' in app.user.roles %}
     const chart_projet_element = document.getElementById("projet_chart");
     const data_nbr_projet = {
-        labels: [
-            'A faire',
-            'En cours',
-            'Bloqué',
-            'Terminé'
-        ],
+        labels: ['A faire','En cours','Bloqué','Terminé'],
         datasets: [{
             label: "Répartition des projets",
             data: ['{{ projet_a_faire }}', '{{ projet_en_cours }}', '{{ projet_bloque }}', '{{ projet_termine }}'],
-            backgroundColor: [
-                '#A4B494',
-                '#BEC5AD',
-                '#3B5249',
-                '#519872'
-            ],
+            backgroundColor: ['#cce4f6','#99d1f2','#66bff0','#339fec'],
             hoverOffset: 10
         }]
     };
-    const config_nbr_projet = {
-        type: 'doughnut',
-        data: data_nbr_projet,
-    };
-    const chart_projet = new Chart(chart_projet_element, config_nbr_projet);
+    new Chart(chart_projet_element, {type:'doughnut', data: data_nbr_projet});
 
     const chart_tache_element = document.getElementById("tache_chart");
     const data_nbr_tache = {
-        labels: [
-            'A faire',
-            'En cours',
-            'Bloqué',
-            'Terminé'
-        ],
+        labels: ['A faire','En cours','Bloqué','Terminé'],
         datasets: [{
             label: "Répartition des tâches",
             data: ['{{ tache_a_faire }}', '{{ tache_en_cours }}', '{{ tache_bloque }}', '{{ tache_termine }}'],
-            backgroundColor: [
-                '#A4B494',
-                '#BEC5AD',
-                '#3B5249',
-                '#519872'
-            ],
+            backgroundColor: ['#cce4f6','#99d1f2','#66bff0','#339fec'],
             hoverOffset: 10
         }]
     };
-    const config_nbr_tache = {
-        type: 'doughnut',
-        data: data_nbr_tache,
-    };
-    const chart_tache = new Chart(chart_tache_element, config_nbr_tache);
+    new Chart(chart_tache_element, {type:'doughnut', data: data_nbr_tache});
+
     const chart_user_element = document.getElementById("user_chart");
     const data_nbr_user = {
-        labels: [
-            'Chef département',
-            'Collaborateur',
-            'Chef BU'
-        ],
+        labels: ['Chef département','Collaborateur','Chef BU'],
         datasets: [{
             label: "Répartition des utilisateurs",
             data: ['{{ utilisateur_chef_departement }}', '{{ utilisateur_collaborateur }}', '{{ utilisateur_chef_bu }}'],
-            backgroundColor: [
-                '#A4B494',
-                '#BEC5AD',
-                '#3B5249'
-            ],
+            backgroundColor: ['#cce4f6','#99d1f2','#66bff0'],
             hoverOffset: 10
         }]
     };
-    const config_nbr_user = {
-        type: 'doughnut',
-        data: data_nbr_user,
-    };
-    const chart_user = new Chart(chart_user_element, config_nbr_user);
+    new Chart(chart_user_element, {type:'doughnut', data: data_nbr_user});
+    {% endif %}
 
-    
-</script>
-{% endif %}
-<!-- Ajout d’une section Utilisateurs avec lien vers la liste -->
-{# <div class="mt-5">
-    <a href="{{ path('user_index') }}" class="btn btn-primary">
-        Voir la liste des utilisateurs
-    </a>
-</div> #}
-
-
-{% if 'ROLE_BU' in app.user.roles %}
-<div class=" " style="display: flex; flex-wrap: wrap; justify-content: space-evenly; gap: 20px;">
-
-
-    <div class="p-4 shadow rounded bg-light" style="width: 18rem;">
-        <a href="{{ path('app_project_index') }}" class="btn"><h5>Projets ({{ projet|length }}) </h5></a>
-        <canvas id="projet_chart_bu"></canvas>
-    </div>
-    <div class="p-4 shadow rounded bg-light" style="width: 18rem;">
-        <a href="{{ path('app_task_index') }}" class="btn"><h5>Tâches ({{ task|length }})</h5></a>
-        <canvas id="tache_chart_bu"></canvas>
-    </div>
-</div>
-<script>
+    // Charts BU
+    {% if 'ROLE_BU' in app.user.roles %}
     const chart_projet_element_bu = document.getElementById("projet_chart_bu");
     const data_nbr_projet_bu = {
-        labels: [
-            'A faire',
-            'En cours',
-            'Bloqué',
-            'Terminé'
-        ],
+        labels: ['A faire','En cours','Bloqué','Terminé'],
         datasets: [{
-            label: "Répartition des tâches",
+            label: "Répartition des projets",
             data: ['{{ projet_a_faire|length }}', '{{ projet_en_cours|length }}', '{{ projet_bloque|length }}', '{{ projet_termine|length }}'],
-            backgroundColor: [
-                '#A4B494',
-                '#BEC5AD',
-                '#3B5249',
-                '#519872'
-            ],
+            backgroundColor: ['#cce4f6','#99d1f2','#66bff0','#339fec'],
             hoverOffset: 10
         }]
     };
-    const config_nbr_projet_bu = {
-        type: 'doughnut',
-        data: data_nbr_projet_bu,
-    };
-    const chart_projet_bu = new Chart(chart_projet_element_bu, config_nbr_projet_bu);
+    new Chart(chart_projet_element_bu, {type:'doughnut', data: data_nbr_projet_bu});
 
-    
     const chart_tache_element_bu = document.getElementById("tache_chart_bu");
     const data_nbr_tache_bu = {
-        labels: [
-            'A faire',
-            'En cours',
-            'Bloqué',
-            'Terminé'
-        ],
+        labels: ['A faire','En cours','Bloqué','Terminé'],
         datasets: [{
             label: "Répartition des tâches",
             data: ['{{ task_a_faire|length }}', '{{ task_en_cours|length }}', '{{ task_bloque|length }}', '{{ task_termine|length }}'],
-            backgroundColor: [
-                '#A4B494',
-                '#BEC5AD',
-                '#3B5249',
-                '#519872'
-            ],
+            backgroundColor: ['#cce4f6','#99d1f2','#66bff0','#339fec'],
             hoverOffset: 10
         }]
     };
-    const config_nbr_tache_bu = {
-        type: 'doughnut',
-        data: data_nbr_tache_bu,
-    };
-    const chart_tache_bu = new Chart(chart_tache_element_bu, config_nbr_tache_bu);
+    new Chart(chart_tache_element_bu, {type:'doughnut', data: data_nbr_tache_bu});
+    {% endif %}
 </script>
-{% endif %}
-
 {% endblock %}

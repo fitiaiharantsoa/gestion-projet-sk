@@ -3,34 +3,35 @@
 {% block title %}Authentification à deux facteurs{% endblock %}
 
 {% block body %}
-    <div class="container mt-5">
-        <h1 class="mb-4">Authentification à deux facteurs</h1>
+<div class="container mt-5" style="max-width: 500px;">
+    <h1 class="mb-4 text-center">Authentification à deux facteurs</h1>
 
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger">{{ message }}</div>
+    {% endfor %}
 
-        {% for message in app.flashes('error') %}
-            <div class="alert alert-danger">{{ message }}</div>
-        {% endfor %}
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
 
-        {% for message in app.flashes('success') %}
-            <div class="alert alert-success">{{ message }}</div>
-        {% endfor %}
+    <form method="post" action="{{ path('app_2fa_login_check') }}">
+        <div class="form-floating mb-3">
+            <input type="text" id="auth_code" name="_auth_code" class="form-control" placeholder="Code reçu par email" required autofocus>
+            <label for="auth_code">Code reçu par email</label>
+        </div>
 
-        <form method="post" action="{{ path('app_2fa_login_check') }}">
-            <div class="mb-3">
-                <label for="auth_code" class="form-label">Code reçu par email :</label>
-                <input type="text" id="auth_code" name="_auth_code" class="form-control" required autofocus />
-            </div>
+        <div class="form-check mb-3">
+            <input type="checkbox" class="form-check-input" id="remember_device" name="_remember_device" value="1">
+            <label class="form-check-label" for="remember_device">Se souvenir de cet appareil</label>
+        </div>
 
-            <div class="form-check mb-3">
-                <input type="checkbox" class="form-check-input" id="remember_device" name="_remember_device" value="1">
-                <label class="form-check-label" for="remember_device">Se souvenir de cet appareil</label>
-            </div>
+        <input type="hidden" name="_trusted_device_token" id="_trusted_device_token" />
 
-            <input type="hidden" name="_trusted_device_token" id="_trusted_device_token" />
-
+        <div class="text-end">
             <button type="submit" class="btn btn-primary">Valider</button>
-        </form>
-    </div>
+        </div>
+    </form>
+</div>
 {% endblock %}
 
 {% block javascripts %}

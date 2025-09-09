@@ -1,42 +1,118 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}BU index{% endblock %}
+{% block title %}Liste des BU{% endblock %}
 
 {% block body %}
-<h1>Liste des BU</h1>
+<h2 class="text-center mb-4" style="font-size:1.6rem; font-weight:600;">Liste des BU</h2>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Id</th>
-            <th>Nom</th>
-            <th>Responsable</th>
-            <th>actions</th>
-        </tr>
-    </thead>
-    <tbody>
+<div class="mb-3 text-end">
+    {% if 'ROLE_PDG' in app.user.roles %}
+        <a href="{{ path('app_b_u_new') }}" class="btn btn-new">Nouveau</a>
+    {% endif %}
+</div>
+
+<div class="table-responsive">
+    <table class="table table-modern">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nom</th>
+                <th>Responsable</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
         {% for b_u in b_us %}
-        <tr>
-            <td>{{ b_u.id }}</td>
-            <td>{{ b_u.nom }}</td>
-            <td>{{ b_u.responsable.nom }} {{ b_u.responsable.prenom }}</td>
-            <td>
-                <a href="{{ path('app_b_u_show', {'id': b_u.id}) }}">Voir</a>
-                {% if 'ROLE' in app.user.roles %}
-                <a href="{{ path('app_b_u_edit', {'id': b_u.id}) }}">Modifier</a>
-                {% endif %}
-
-            </td>
-        </tr>
+            <tr>
+                <td>{{ b_u.id }}</td>
+                <td>{{ b_u.nom }}</td>
+                <td>{{ b_u.responsable.nom }} {{ b_u.responsable.prenom }}</td>
+                <td>
+                    <a href="{{ path('app_b_u_show', {'id': b_u.id}) }}" class="btn btn-view btn-sm">Voir</a>
+                    {% if 'ROLE_PDG' in app.user.roles %}
+                        <a href="{{ path('app_b_u_edit', {'id': b_u.id}) }}" class="btn btn-edit btn-sm">Modifier</a>
+                    {% endif %}
+                </td>
+            </tr>
         {% else %}
-        <tr>
-            <td colspan="3">Aucun BU</td>
-        </tr>
+            <tr>
+                <td colspan="4" class="text-center">Aucun BU</td>
+            </tr>
         {% endfor %}
-    </tbody>
-</table>
+        </tbody>
+    </table>
+</div>
 
-{% if 'ROLE_PDG' in app.user.roles %}
-<a href="{{ path('app_b_u_new') }}">Nouveau</a>
-{% endif %}
+<style>
+/* Tableau stylé */
+.table-modern {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.5rem;
+}
+
+.table-modern thead th {
+    background-color: #f3f4f6;
+    color: #0f172a;
+    font-weight: 600;
+    border-radius: 0.5rem;
+}
+
+.table-modern tbody tr {
+    background-color: #ffffff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    transition: transform 0.2s;
+}
+
+.table-modern tbody tr:hover {
+    transform: translateY(-2px);
+}
+
+.table-modern th, .table-modern td {
+    padding: 0.75rem 1rem;
+    vertical-align: middle;
+}
+
+/* Boutons */
+.btn-new {
+    background-color: #60a5fa;
+    color: white;
+    padding: 0.4rem 0.9rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+}
+
+.btn-new:hover {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.btn-view {
+    background-color: #22c55e;
+    color: white;
+    border-radius: 0.5rem;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+    transition: all 0.2s;
+}
+
+.btn-view:hover {
+    background-color: #16a34a;
+    color: white;
+}
+
+.btn-edit {
+    background-color: #facc15;
+    color: white;
+    border-radius: 0.5rem;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+}
+
+.btn-edit:hover {
+    background-color: #eab308;
+    color: white;
+}
+</style>
 {% endblock %}

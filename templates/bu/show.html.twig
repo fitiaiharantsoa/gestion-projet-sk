@@ -3,60 +3,56 @@
 {% block title %}BU{% endblock %}
 
 {% block body %}
-<h1>BU</h1>
+<div class="container py-4">
+    <!-- Titre -->
+    <h1 class="text-center text-dark mb-4" style="font-size: 1.6rem;">BU : {{ b_u.nom }}</h1>
 
-<table class="table">
-    <tbody>
-        <tr>
-            <th>Id</th>
-            <td>{{ b_u.id }}</td>
-        </tr>
-        <tr>
-            <th>Nom</th>
-            <td>{{ b_u.nom }}</td>
-        </tr>
-    </tbody>
-</table>
+    <!-- Table BU -->
+    <div class="card shadow-sm p-3 mb-4">
+        <table class="table table-borderless mb-0">
+            <tbody>
+                <tr>
+                    <th style="width: 150px;">Id</th>
+                    <td>{{ b_u.id }}</td>
+                </tr>
+                <tr>
+                    <th>Nom</th>
+                    <td>{{ b_u.nom }}</td>
+                </tr>
+                <tr>
+                    <th>Responsable</th>
+                    <td>{{ b_u.responsable.nom }} {{ b_u.responsable.prenom }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
-<h3>Départements</h3>
-<ul>
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <th>Nom</th>
-                <th>Action</th>
-            </tr>
-            {% for department in departements %}
-            {# <li>
-                <a href="{{ path('app_departement_show', {'id': department.id}) }}">{{ department.nom }}</a>
-            </li> #}
-            <tr>
-                <td>{{department.id}}</td>
-                <td>{{department.nom}}</td>
-                <td><a href="{{ path('app_departement_show', {'id': department.id}) }}">Voir</a></td>
-            </tr>
-            {% else %}
-            <tr>
-                <td>Aucun département</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {# {% for department in departements %}
-    <li>
-        <a href="{{ path('app_departement_show', {'id': department.id}) }}">{{ department.nom }}</a>
-    </li>
+    <!-- Boutons -->
+    <div class="d-flex justify-content-between mt-3">
+        <a href="{{ path('app_b_u_index') }}" class="btn btn-back btn-sm">Retour</a>
+        {% if 'ROLE_PDG' in app.user.roles %}
+        <a href="{{ path('app_b_u_edit', {'id': b_u.id}) }}" class="btn btn-warning btn-sm">Modifier</a>
+        {% endif %}
+    </div>
+</div>
 
-    {% else %}
-    <li>No departments found</li>
-    {% endfor %} #}
-    <a href="{{ path('app_b_u_index') }}">back to list</a>
+<style>
+/* Bouton Retour stylé */
+.btn-back {
+    background-color: #60a5fa;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.9rem;
+    font-size: 0.875rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+}
+.btn-back:hover { background-color: #3b82f6; }
 
-    {% if 'ROLE_PDG' in app.user.roles %}
-    <a href="{{ path('app_b_u_edit', {'id': b_u.id}) }}">edit</a>
+/* Card */
+.card { border-radius: 0.75rem; }
 
-    {{ include('bu/_delete_form.html.twig') }}
-    {% endif %}
-    
-    {% endblock %}
+/* Titre */
+h1 { font-family: 'Segoe UI', sans-serif; }
+</style>
+{% endblock %}

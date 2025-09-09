@@ -3,30 +3,52 @@
 {% block title %}Modifier Utilisateur{% endblock %}
 
 {% block body %}
-<h1>Modifier le profil utilisateur</h1>
+<div class="container mt-5">
+    <h1 class="h3 mb-4 fw-bold">Modifier le profil utilisateur</h1>
 
-{{ form_start(form) }}
-    {# {{ form_widget(form) }} #}
-    <div class="form-floating mb-3">
-        {{ form_widget(form.email) }}
-        {{ form_label(form.email) }}
-        {{ form_errors(form.email) }}
-    </div>
-    <div class="mb-3">
-
-        {{ form_label(form.roles) }}
-       {% for choice in form.roles %}
-            <div class="form-check">
-                {{form_widget(choice)}}
-                {{form_label(choice)}}
-                {{form_errors(choice)}}
+    <div class="card shadow-sm rounded-3 p-4">
+        {{ form_start(form) }}
+        
+            <div class="form-floating mb-3">
+                {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
+                {{ form_label(form.email, 'Adresse e-mail') }}
+                {{ form_errors(form.email) }}
             </div>
-       {% endfor %}
-    </div>
-        {{ form_row(form.isVerified) }}
-        {{ form_row(form.isEmailAuthEnabled) }}
-    <button class="btn btn-primary">Enregistrer</button>
-{{ form_end(form) }}
 
-<a href="{{ path('user_index') }}">← Retour à la liste</a>
+            <div class="mb-3">
+                {{ form_label(form.roles, 'Rôles') }}
+                <div class="ms-3">
+                    {% for choice in form.roles %}
+                        <div class="form-check">
+                            {{ form_widget(choice, {'attr': {'class': 'form-check-input'}}) }}
+                            {{ form_label(choice, null, {'label_attr': {'class': 'form-check-label'}}) }}
+                            {{ form_errors(choice) }}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="form-check mb-3">
+                {{ form_widget(form.isVerified, {'attr': {'class': 'form-check-input'}}) }}
+                {{ form_label(form.isVerified, 'Compte vérifié', {'label_attr': {'class': 'form-check-label'}}) }}
+                {{ form_errors(form.isVerified) }}
+            </div>
+
+            <div class="form-check mb-3">
+                {{ form_widget(form.isEmailAuthEnabled, {'attr': {'class': 'form-check-input'}}) }}
+                {{ form_label(form.isEmailAuthEnabled, 'Authentification par email activée', {'label_attr': {'class': 'form-check-label'}}) }}
+                {{ form_errors(form.isEmailAuthEnabled) }}
+            </div>
+
+            <div class="text-end">
+                <button type="submit" class="btn btn-primary rounded-3 px-4 py-2">Enregistrer</button>
+            </div>
+
+        {{ form_end(form) }}
+    </div>
+
+    <div class="mt-3">
+        <a href="{{ path('user_index') }}" class="text-decoration-none">&larr; Retour à la liste des utilisateurs</a>
+    </div>
+</div>
 {% endblock %}
